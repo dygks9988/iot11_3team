@@ -13,7 +13,7 @@ class Base(DeclarativeBase):
 class Device(Base):
     __tablename__ = 'device'
 
-    device_seq: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
+    device_seq: Mapped[int] = mapped_column(INTEGER(11), primary_key=True, autoincrement=True)
     device_id: Mapped[str] = mapped_column(CHAR(5), nullable=False)
     device_name: Mapped[str] = mapped_column(String(50), nullable=False)
     create_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
@@ -36,6 +36,6 @@ class DeviceLog(Base):
     value_code: Mapped[str] = mapped_column(CHAR(4), nullable=False)
     value: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     recorded_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
-    recorede_point: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
+    recorded_point: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
 
     device: Mapped['Device'] = relationship('Device', back_populates='device_log')
