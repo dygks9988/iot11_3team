@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block header %}
+{% include "header.html" %}
+{% endblock %}
+{% block content %}
+<div class="chart-grid">
+    <div class="chart-box"><canvas id="today"></canvas></div>
+    <div class="chart-box">
+        <canvas id="compare"></canvas>
+        <div class="date-picker-container" style="margin-top: 15px; text-align: center;">
+            <label for="chartDate">날짜 선택: </label>
+            <input type="date" id="chartDate" name="chartDate">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx1 = document.getElementById('today');
+
+    const todayChart = new Chart(ctx1, {
+        type : 'line',
+        data : {
+            labels: {{ labels | tojson }},
+            datasets: [{
+                label: 'test chart',
+                data: {{ data | tojson }},
+                borderWidth: 1
+            }]
+        },
+        options : {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const ctx2 = document.getElementById('compare');
+
+    const compareChart = new Chart(ctx2, {
+        type : 'line',
+        data : {
+            labels: ['A', 'B', 'C', 'D', 'E', 'F'],
+            datasets: [{
+                label: 'test chart',
+                data: [7, 20, 25, 1, 14, 15],
+
+                borderColor: 'black',
+                borderWidth: 2,
+                tension: 0.4,
+
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+
+                pointRadius: 5,
+                pointBackgroundColor: 'black',
+                pointBorderColor: 'black',
+                pointBorderWidth: 2,
+                pointStyle: 'circle'
+            },
+            {
+                label: 'test chart',
+                data: [5, 18, 23, 0, 13, 11],
+
+                borderColor: 'black',
+                borderWidth: 2,
+                tension: 0.4,
+
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+
+                pointRadius: 5,
+                pointBackgroundColor: 'black',
+                pointBorderColor: 'black',
+                pointBorderWidth: 2,
+                pointStyle: 'circle'
+            }]
+        },
+        options : {
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    const dateInput = document.getElementById('chartDate');
+
+    dateInput.addEventListener('change', function(event) {
+        const selectedDate = event.target.value;    // yyyy-mm-dd 형식의 문자열
+
+        if (!selectedDate) return;
+
+        fetch("/api/temp", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                        selectedDate:selectedDate
+                    })
+        })
+        .then(response => response.json())
+        .then(data => {
+            compareChart.data.labels = data.labels;
+            compareChart.data.datasets[0].data = data.data;
+            compareChart.update();
+        })
+        .catch(error => {console.error(error);});
+    })
+</script>
+{% endblock %}
