@@ -1,77 +1,81 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Temperature{% endblock %}
 {% block header %}
 {% include "header.html" %}
 {% endblock %}
 {% block content %}
 <div class="chart-grid">
     <div class="chart-box"><canvas id="today"></canvas></div>
-    <div class="chart-box">
-        <canvas id="compare"></canvas>
-        <div class="date-picker-container" style="margin-top: 15px; text-align: center;">
-            <label for="chartDate">날짜 선택: </label>
-            <input type="date" id="chartDate" name="chartDate">
-        </div>
+    <div class="chart-box"><canvas id="compare"></canvas></div>
+    <div class="date-picker-container" style="grid-column: 2; margin-top: 15px; text-align: center;">
+        <label for="chartDate">날짜 선택: </label>
+        <input type="date" id="chartDate" name="chartDate">
     </div>
 </div>
 {% endblock %}
 
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx1 = document.getElementById('today');
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 
+<script>
+    const rawLabels = {{ labels | tojson }};
+    const rawValues = {{ value | tojson }};
+
+    function formatToTimeSeries(labels, values) {
+        if (!labels || !values) return [];
+        return labels.map((label, idx) => ({
+            x: label,
+            y: values[idx]
+        }));
+    }
+
+    const timeData = formatToTimeSeries(rawLabels, rawValues);
+
+    const ctx1 = document.getElementById('today');
     const todayChart = new Chart(ctx1, {
-        type : 'line',
-        data : {
-            labels: {{ labels | tojson }},
+        type: 'line',
+        data: {
             datasets: [{
-                label: 'test chart',
-                data: {{ value | tojson }},
+                label: 'Today',
+                data: timeData,
                 borderWidth: 1
             }]
         },
-        options : {
+        options: {
             scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        parser: 'HH:mm',
+                        unit: 'hour',
+                        displayFormats: { hour: 'HH:mm' }
+                    },
+                    min: '00:00',
+                    max: '23:59'
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: false,
+                    min: 10,
+                    max: 50
                 }
             }
         }
     });
 
     const ctx2 = document.getElementById('compare');
-
     const compareChart = new Chart(ctx2, {
-        type : 'line',
-        data : {
-            labels: ['A', 'B', 'C', 'D', 'E', 'F'],
+        type: 'line',
+        data: {
             datasets: [{
-                label: 'test chart',
-                data: [7, 20, 25, 1, 14, 15],
+                label: 'Compare',
+                data: timeData,
 
                 borderColor: 'black',
                 borderWidth: 2,
                 tension: 0.4,
-
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
-
-                pointRadius: 5,
-                pointBackgroundColor: 'black',
-                pointBorderColor: 'black',
-                pointBorderWidth: 2,
-                pointStyle: 'circle'
-            },
-            {
-                label: 'test chart',
-                data: [5, 18, 23, 0, 13, 11],
-
-                borderColor: 'black',
-                borderWidth: 2,
-                tension: 0.4,
-
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-
                 pointRadius: 5,
                 pointBackgroundColor: 'black',
                 pointBorderColor: 'black',
@@ -79,18 +83,24 @@
                 pointStyle: 'circle'
             }]
         },
-        options : {
+        options: {
             scales: {
                 x: {
-                    grid: {
-                        display: false
-                    }
+                    type: 'time',
+                    time: {
+                        parser: 'HH:mm',
+                        unit: 'hour',
+                        displayFormats: { hour: 'HH:mm' }
+                    },
+                    min: '00:00',
+                    max: '23:59',
+                    grid: { display: false }
                 },
                 y: {
-                    beginAtZero: true,
-                    grid: {
-                        display: false
-                    }
+                    beginAtZero: false,
+                    grid: { display: false },
+                    min: 10,
+                    max: 50
                 }
             }
         }
@@ -99,24 +109,20 @@
     const dateInput = document.getElementById('chartDate');
 
     dateInput.addEventListener('change', function(event) {
-        const selectedDate = event.target.value;    // yyyy-mm-dd 형식의 문자열
-
+        const selectedDate = event.target.value;
         if (!selectedDate) return;
 
         fetch("/api/temp", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                        selectedDate:selectedDate
-                    })
+            body: JSON.stringify({ date: selectedDate })
         })
         .then(response => response.json())
         .then(data => {
-            compareChart.data.labels = data.labels;
-            compareChart.data.datasets[0].data = data.data;
+            compareChart.data.datasets[0].data = formatToTimeSeries(data.labels, data.value);
             compareChart.update();
         })
-        .catch(error => {console.error(error);});
-    })
+        .catch(error => { console.error(error); });
+    });
 </script>
 {% endblock %}
