@@ -9,6 +9,10 @@ from sqlalchemy.orm import Session
 app = Flask(__name__)
 
 engine = create_engine("mysql+pymysql://project_user:project!%40#$@192.168.1.37/robot?charset=utf8mb4")
+<<<<<<< HEAD
+=======
+
+>>>>>>> bb3d5e472f7beb715ca242f80f1d11c3805caf95
 
 @app.route("/dashboard")
 def dashboard():
@@ -45,8 +49,13 @@ def dashboard():
             charts.append({
                 "device_seq": device.device_seq,
                 "device_name": device.device_name,
+<<<<<<< HEAD
                 "labels":[f"{row.hour:02d}:{row.minute:02d}" for row in rows],
                 "values": [float(row.value) for row in rows]
+=======
+                "labels":[f"{row.hour}:00" for row in rows],
+                "values": [float(row.value) if row.value is not None else 0.0 for row in rows]
+>>>>>>> bb3d5e472f7beb715ca242f80f1d11c3805caf95
             })
 
 
