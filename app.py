@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import pymysql
 from sqlalchemy import create_engine, select, func
 from models import DeviceLog, Device
@@ -50,8 +50,15 @@ def dashboard():
 
         return render_template("dashboard.html", charts = charts)
 
-def get_sensor_chart(device_seq):
+
+def get_sensor_chart(device_seq,selected_date = None):
     with Session(engine) as db_session:
+
+        if selected_date is None:
+            target_date = func.current_date()
+        else:
+            target_date = selected_date
+
         stmt = (
             select(
                 func.hour(DeviceLog.recorded_at).label("hour"),
@@ -59,7 +66,7 @@ def get_sensor_chart(device_seq):
             )
             .where(
                 DeviceLog.device_seq == device_seq,
-                func.date(DeviceLog.recorded_at) == func.curdate()
+                func.date(DeviceLog.recorded_at) == target_date
             )
             .group_by(
                 func.hour(DeviceLog.recorded_at)
@@ -79,24 +86,63 @@ def get_sensor_chart(device_seq):
 
 @app.get("/temp")
 def temp():
-    chart = get_sensor_chart(2)
+    chart = get_sensor_chart(1)
 
     return render_template("temp.html",labels=chart["labels"],value=chart["values"])
 
+@app.post("/api/temp")
+def chart_date():
+
+    selected_date = request.get_json()['date'];
+
+    chart = get_sensor_chart(1,selected_date)
+
+    return jsonify(labels=chart["labels"],value=chart["values"])
 
 @app.get("/hum")
 def hum():
-    return render_template("hum.html")
+    chart = get_sensor_chart(2)
 
+    return render_template("hum.html",labels=chart["labels"],value=chart["values"])
+
+@app.post("/api/hum")
+def chart_date():
+
+    selected_date = request.get_json()['date'];
+
+    chart = get_sensor_chart(2,selected_date)
+
+    return jsonify(chart)
 
 @app.get("/dust")
 def dust():
-    return render_template("dust.html")
+    chart = get_sensor_chart(3)
+    
+    return render_template("dust.html",labels=chart["labels"],value=chart["values"])
 
+@app.post("/api/dust")
+def chart_date():
+
+    selected_date = request.get_json()['date'];
+
+    chart = get_sensor_chart(3,selected_date)
+
+    return jsonify(chart)
 
 @app.get("/co2")
 def co2():
-    return render_template("co2.html")
+    chart = get_sensor_chart(4)
+        
+    return render_template("co2.html",labels=chart["labels"],value=chart["values"])
+
+@app.post("/api/co2")
+def chart_date():
+
+    selected_date = request.get_json()['date'];
+
+    chart = get_sensor_chart(4,selected_date)
+
+    return jsonify(chart)
 
 if __name__ == "__main__" :
     app.run(debug=True)
