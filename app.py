@@ -91,7 +91,7 @@ def temp():
     return render_template("temp.html",labels=chart["labels"],value=chart["values"])
 
 @app.post("/api/temp")
-def chart_date():
+def temp_chart_date():
 
     selected_date = request.get_json()['date'];
 
@@ -106,13 +106,13 @@ def hum():
     return render_template("hum.html",labels=chart["labels"],value=chart["values"])
 
 @app.post("/api/hum")
-def chart_date():
+def hum_chart_date():
 
     selected_date = request.get_json()['date'];
 
     chart = get_sensor_chart(2,selected_date)
 
-    return jsonify(chart)
+    return jsonify(labels=chart["labels"],value=chart["values"])
 
 @app.get("/dust")
 def dust():
@@ -121,13 +121,13 @@ def dust():
     return render_template("dust.html",labels=chart["labels"],value=chart["values"])
 
 @app.post("/api/dust")
-def chart_date():
+def dust_chart_date():
 
     selected_date = request.get_json()['date'];
 
     chart = get_sensor_chart(3,selected_date)
 
-    return jsonify(chart)
+    return jsonify(labels=chart["labels"],value=chart["values"])
 
 @app.get("/co2")
 def co2():
@@ -136,13 +136,13 @@ def co2():
     return render_template("co2.html",labels=chart["labels"],value=chart["values"])
 
 @app.post("/api/co2")
-def chart_date():
+def co2_chart_date():
 
     selected_date = request.get_json()['date'];
 
     chart = get_sensor_chart(4,selected_date)
 
-    return jsonify(chart)
+    return jsonify(labels=chart["labels"],value=chart["values"])
 
 if __name__ == "__main__" :
     app.run(debug=True)
