@@ -8,8 +8,7 @@ from sqlalchemy.orm import Session
 
 app = Flask(__name__)
 
-engine = create_engine("mysql+pymysql://ktech:ktech!%40#$@192.168.1.37/robot?charset=utf8mb4")
-
+engine = create_engine("mysql+pymysql://project_user:project!%40#$@192.168.1.37/robot?charset=utf8mb4")
 
 @app.route("/dashboard")
 def dashboard():
@@ -25,6 +24,7 @@ def dashboard():
             stmt = (
                 select(
                     func.hour(DeviceLog.recorded_at).label("hour"),
+                    func.minute(DeviceLog.recorded_at).label("minute"),
                     func.round(func.avg(DeviceLog.value)).label("value")
                 )
                 .where(
@@ -32,10 +32,12 @@ def dashboard():
                     func.date(DeviceLog.recorded_at) == func.curdate()
                 )
                 .group_by(
-                    func.hour(DeviceLog.recorded_at)
+                    func.hour(DeviceLog.recorded_at),
+                    func.minute(DeviceLog.recorded_at)
                 )
                 .order_by(
-                    func.hour(DeviceLog.recorded_at)
+                    func.hour(DeviceLog.recorded_at),
+                    func.minute(DeviceLog.recorded_at)
                 )
             )
             rows = db_session.execute(stmt).all()
@@ -43,7 +45,7 @@ def dashboard():
             charts.append({
                 "device_seq": device.device_seq,
                 "device_name": device.device_name,
-                "labels":[f"{row.hour}:00" for row in rows],
+                "labels":[f"{row.hour:02d}:{row.minute:02d}" for row in rows],
                 "values": [float(row.value) for row in rows]
             })
 
@@ -62,26 +64,30 @@ def get_sensor_chart(device_seq,selected_date = None):
         stmt = (
             select(
                 func.hour(DeviceLog.recorded_at).label("hour"),
-                func.round(func.avg(DeviceLog.value)).label("value")
+                func.minute(DeviceLog.recorded_at).label("minute"),
+                func.round(func.avg(DeviceLog.value), 1).label("value")
             )
             .where(
                 DeviceLog.device_seq == device_seq,
                 func.date(DeviceLog.recorded_at) == target_date
             )
             .group_by(
-                func.hour(DeviceLog.recorded_at)
+                func.hour(DeviceLog.recorded_at),
+                func.minute(DeviceLog.recorded_at)
             )
             .order_by(
-                func.hour(DeviceLog.recorded_at)
+                func.hour(DeviceLog.recorded_at),
+                func.minute(DeviceLog.recorded_at)
             )
         )
 
         
         rows = db_session.execute(stmt).all()
         
-        print(rows)
+        for row in rows:
+            print(row.hour, row.minute, row.value)
 
-        return { "labels": [f"{row.hour}:00"for row in rows],
+        return { "labels": [f"{row.hour:02d}:{row.minute:02d}"for row in rows],
                  "values": [float(row.value)for row in rows] }
 
 @app.get("/temp")
