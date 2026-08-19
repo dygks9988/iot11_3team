@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Temperature{% endblock %}
+{% block title %}Dust{% endblock %}
 {% block header %}
 {% include "header.html" %}
 {% endblock %}
@@ -114,7 +114,7 @@
         const selectedDate = event.target.value;
         if (!selectedDate) return;
 
-        fetch("/api/temp", {
+        fetch("/api/dust", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ date: selectedDate })
