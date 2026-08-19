@@ -146,20 +146,6 @@ def co2_chart_date():
     return jsonify(labels=chart["labels"],value=chart["values"])
 
 
-@app.get("/pm25")
-def pm25():
-    chart = get_sensor_chart(3,'pm25')
-        
-    return render_template("pm25.html",labels=chart["labels"],value=chart["values"])
-
-@app.post("/api/pm25")
-def pm25_chart_date():
-
-    selected_date = request.get_json()['date'];
-
-    chart = get_sensor_chart(3,'pm25',selected_date)
-
-    return jsonify(labels=chart["labels"],value=chart["values"])
 
 if __name__ == "__main__" :
     app.run(debug=True)
