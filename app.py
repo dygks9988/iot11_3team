@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 app = Flask(__name__)
 
-engine = create_engine("mysql+pymysql://ktech:ktech!%40#$@192.168.1.37/robot?charset=utf8mb4")
+engine = create_engine("mysql+pymysql://project_user:project!%40#$@192.168.1.37/robot?charset=utf8mb4")
 
 
 @app.route("/dashboard")
@@ -44,7 +44,7 @@ def dashboard():
                 "device_seq": device.device_seq,
                 "device_name": device.device_name,
                 "labels":[f"{row.hour}:00" for row in rows],
-                "values": [float(row.value) for row in rows]
+                "values": [float(row.value) if row.value is not None else 0.0 for row in rows]
             })
 
 
