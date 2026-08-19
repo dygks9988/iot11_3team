@@ -1,109 +1,107 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장비 모니터링 대시보드</title>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #334155; padding: 24px; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid #e2e8f0; }
-        h1 { font-size: 1.5rem; color: #0f172a; font-weight: 700; }
-        nav { display: flex; gap: 8px; }
-        nav a { text-decoration: none; color: #475569; font-weight: 600; padding: 8px 14px; border-radius: 8px; background-color: #ffffff; border: 1px solid #cbd5e1; font-size: 0.9rem; }
-        nav a:hover, nav a.active { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
-
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .card-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
-        .btn-detail { font-size: 0.8rem; padding: 5px 12px; background-color: #eff6ff; color: #2563eb; border-radius: 6px; text-decoration: none; font-weight: 600; }
-        
-        .chart-container { position: relative; height: 220px; width: 100%; }
-        .empty-msg { grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 40px; }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1> 장비 모니터링 대시보드</h1>
-        <nav>
-            <a href="/dashboard" class="active">전체 대시보드</a>
-            <a href="/temp">온도</a>
-            <a href="/hum">습도</a>
-            <a href="/dust">미세먼지</a>
-            <a href="/co2">CO2</a>
-        </nav>
-    </header>
-
-    <main class="grid-container">
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block header %}
+{% include "header.html" %}
+{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+    <div class="chart-grid">
         {% for chart in charts %}
-        <div class="card">
+        <div class="chart-box">
             <div class="card-header">
-                <span class="card-title">{{ chart.device_name }}</span>
-                {% if chart.device_seq == 1 %}
-                    <a href="/temp" class="btn-detail">상세보기 &rarr;</a>
-                {% elif chart.device_seq == 2 %}
-                    <a href="/hum" class="btn-detail">상세보기 &rarr;</a>
-                {% elif chart.device_seq == 3 %}
-                    <a href="/dust" class="btn-detail">상세보기 &rarr;</a>
-                {% elif chart.device_seq == 4 %}
-                    <a href="/co2" class="btn-detail">상세보기 &rarr;</a>
-                {% else %}
-                    <a href="#" class="btn-detail">상세보기 &rarr;</a>
-                {% endif %}
+                <h3>
+                    {{ chart.device_name }}
+                    <span style="font-size: 0.85rem; color: #64748b; font-weight: normal;">
+                        ({% if chart.value_code == 'temp' %}온도
+                         {% elif chart.value_code == 'hum' %}습도
+                         {% elif chart.value_code == 'co2' %}CO2
+                         {% elif chart.value_code == 'dust' %}미세먼지
+                         {% else %}{{ chart.value_code }}{% endif %})
+                    </span>
+                </h3>
+                
+                <!-- value_code 경로로 직접 이동 (/temp, /hum, /co2, /dust, /pm25) -->
+                <a href="/{{ chart.value_code }}" class="btn-detail">상세보기 &rarr;</a>
             </div>
             
-            <div class="chart-container">
-                <canvas id="chart-{{ chart.device_seq }}"></canvas>
+            <div style="position: relative; height: 240px;">
+                <!-- Canvas ID 중복 방지를 위해 device_seq와 value_code 조합 -->
+                <canvas id="chart-{{ chart.device_seq }}-{{ chart.value_code }}"></canvas>
             </div>
         </div>
         {% else %}
-        <div class="empty-msg">현재 표시할 장비 데이터가 없습니다.</div>
+        <p style="text-align: center; grid-column: 1/-1; color: #94a3b8; padding: 40px;">등록된 센서 데이터가 없습니다.</p>
         {% endfor %}
-    </main>
+    </div>
+</div>
+{% endblock %}
 
-    <script>
-        // safe 필터를 추가하여 HTML 이스케이프 방지
-        const chartsData = {{ charts | tojson | safe }};
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 
-        if (Array.isArray(chartsData)) {
-            chartsData.forEach(item => {
-                const ctx = document.getElementById(`chart-${item.device_seq}`);
-                if (!ctx) return;
+<script>
+    const chartsData = {{ charts | tojson | safe }};
 
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: item.labels,
-                        datasets: [{
-                            label: `${item.device_name} 시간별 평균`,
-                            data: item.values,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.35,
-                            pointBackgroundColor: '#2563eb',
-                            pointRadius: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                            x: { grid: { display: false } }
+    function formatToTimeSeries(labels, values) {
+        if (!labels || !values) return [];
+        return labels.map((label, idx) => ({
+            x: label,
+            y: values[idx]
+        }));
+    }
+
+    if (Array.isArray(chartsData)) {
+        chartsData.forEach(item => {
+            // JS에서도 device_seq와 value_code 조합으로 ID를 조회
+            const canvasId = `chart-${item.device_seq}-${item.value_code}`;
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+
+            const timeData = formatToTimeSeries(item.labels, item.values);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: `${item.device_name} (${item.value_code})`,
+                        data: timeData,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                        borderWidth: 2,
+                        tension: 0.35,
+                        fill: true,
+                        pointBackgroundColor: '#2563eb',
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                parser: 'HH:mm',
+                                unit: 'hour',
+                                displayFormats: { hour: 'HH:mm' }
+                            },
+                            min: '00:00',
+                            max: '23:59',
+                            grid: { display: false }
                         },
-                        plugins: { legend: { display: false } }
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: '#f1f5f9' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
                     }
-                });
+                }
             });
-        }
-    </script>
-
-</body>
-</html>
+        });
+    }
+</script>
+{% endblock %}
