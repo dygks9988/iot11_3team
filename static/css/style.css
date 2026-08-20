@@ -1,80 +1,58 @@
-html, body {    
-    margin: 0; 
-    padding: 0;
-    width: 100%;
-    min-height: 100vh; /* 화면 전체 높이 보장 */
-    color: #ffffff;
-    font-family: 'Inter', -apple-system, sans-serif;
-    box-sizing: border-box;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-body:has(.dashboard-card-grid) {
-    background-image: url('../img/sdsds.png'); 
-}
-
-body:has(.chart-dust) {
-    background-image: url('../img/desert.png'); 
-}
-
-body:has(.chart-hum) {
-    background-image: url('../img/rainy.png'); 
-}
-body:has(.chart-co2) {
-    background-image: url('../img/cloud.png'); 
-}
-
-.smart-card{
-    background-color: rgba(255, 255, 255, 0.7) !important;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
+.smart-card, .chart-box {
+    background-color: rgba(255, 255, 255, 0.7) !important; 
+    backdrop-filter: blur(8px);           
+    -webkit-backdrop-filter: blur(8px);  
+    border: 1px solid rgba(20, 17, 17, 0.336);
+    border-radius: 16px;                
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;              
+}
+
+.chart-box {
+    margin-top: 40px;                   
+    flex: 1 1 calc(50% - 24px);         
+    min-width: 320px;                     
+    min-height: 450px;                    
+    display: flex;                         
+    flex-direction: column;               
+    justify-content: center;            
+    padding: 24px;                       
+}
+
+.chart-box canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .dashboard-card-grid {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    padding: 20px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;                         
+    display: flex;                  
+    flex-wrap: wrap;                    
+    gap: 24px;                           
+    padding: 20px 40px;                   
+    max-width: 1400px;                     
+    margin: 0 auto;                       
 }
 
-.chart-dust,.chart-hum,.chart-temp,.chart-co2 {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    padding: 20px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-    box-sizing: border-box;
+.chart-dust, .chart-hum, .chart-temp, .chart-co2 {
+    width: 100%;                          
+    display: flex;                        
+    flex-wrap: wrap;                       
+    gap: 24px;                            
+    padding: 0 40px 40px 40px;            
+    max-width: 1400px;                     
+    margin: 0 auto;                        
+    box-sizing: border-box;                
 }
-
-
-
-/* 3. 개별 차트 카드 박스 디자인 */
-.chart-box {
-    margin-top:60px;
-    flex: 1 1 calc(50% - 24px); /* 한 줄에 2개씩 균등 배치 */
-    min-width: 320px; /* 화면이 좁아지면 자동으로 밑으로 내려감 */
-    background-color: rgba(245, 222, 179, 0.65) !important; /* 그래프 뒷배경 카드 (선택사항) */
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    box-sizing: border-box;
-}
-
 
 .date-picker-container {
-    margin-top: 20px;
-    margin-left: 52%; 
-    text-align: left;
-    color: #121212;
+    width: 100%;
+    max-width: 1400px;
+    margin: 20px auto 10px auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;                     /* 텍스트 색상을 어두운 회색으로 지정 */
 }
