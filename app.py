@@ -194,11 +194,7 @@ def dustchart_date():
 
     charts = get_sensor_chart(
         2,
-<<<<<<< HEAD
         "dust",
-=======
-        "dust.html",
->>>>>>> 2aabcd3 (style.css 업데이트)
         selected_date
     )
 
