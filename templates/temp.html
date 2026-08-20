@@ -4,13 +4,14 @@
 {% include "header.html" %}
 {% endblock %}
 {% block content %}
+<div class="date-picker-container" style="margin-left: auto; width: calc(50% - 12px); margin-top: 15px; text-align: center; box-sizing: border-box;">
+    <label for="chartDate">날짜 선택: </label>
+    <input type="date" id="chartDate" name="chartDate">
+</div>
 <div class="chart-temp">
     <div class="chart-box"><canvas id="today"></canvas></div>
     <div class="chart-box"><canvas id="compare"></canvas></div>
-    <div class="date-picker-container" style="margin-left: auto; width: calc(50% - 12px); margin-top: 15px; text-align: center; box-sizing: border-box;">
-        <label for="chartDate">날짜 선택: </label>
-        <input type="date" id="chartDate" name="chartDate">
-    </div>
+    
 </div>
 {% endblock %}
 
