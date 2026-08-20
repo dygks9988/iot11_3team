@@ -4,7 +4,7 @@
 {% include "header.html" %}
 {% endblock %}
 {% block content %}
-<div class="chart-grid">
+<div class="chart-hum">
     <div class="chart-box"><canvas id="today"></canvas></div>
     <div class="chart-box"><canvas id="compare"></canvas></div>
     <div class="date-picker-container" style="margin-left: auto; width: calc(50% - 12px); margin-top: 15px; text-align: center; box-sizing: border-box;">
@@ -20,9 +20,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 
 <script>
-    const rawLabels = {{ labels | tojson }};
-    const rawValues = {{ value | tojson }};
-
     function formatToTimeSeries(labels, values) {
         if (!labels || !values) return [];
         return labels.map((label, idx) => ({
@@ -31,16 +28,45 @@
         }));
     }
 
-    const timeData = formatToTimeSeries(rawLabels, rawValues);
+    const chartsData = {{ charts | tojson | safe }};
 
+    const timeDataPoints = [1, 2, 3, 4].map(pt => {
+        const item = chartsData.find(i => i.point == pt);
+        return formatToTimeSeries(item?.labels, item?.values);
+    });
+
+    const [timeDataPoint1, timeDataPoint2, timeDataPoint3, timeDataPoint4] = timeDataPoints;
+    
     const ctx1 = document.getElementById('today');
     const todayChart = new Chart(ctx1, {
         type: 'line',
         data: {
-            datasets: [{
-                label: 'Today',
-                data: timeData,
-            }]
+            datasets: [
+                {
+                    label: 'Point1',
+                    data: timeDataPoint1,
+                    borderColor: 'red',
+                    backgroundColor: 'red',
+                },
+                {
+                    label: 'Point2',
+                    data: timeDataPoint2,
+                    borderColor: 'blue',
+                    backgroundColor: 'blue',
+                },
+                {
+                    label: 'Point3',
+                    data: timeDataPoint3,
+                    borderColor: 'green',
+                    backgroundColor: 'green',
+                },
+                {
+                    label: 'Point4',
+                    data: timeDataPoint4,
+                    borderColor: 'yellow',
+                    backgroundColor: 'yellow',
+                }
+            ]
         },
         options: {
             scales: {
@@ -67,10 +93,32 @@
     const compareChart = new Chart(ctx2, {
         type: 'line',
         data: {
-            datasets: [{
-                label: 'Compare',
-                data: timeData,
-            }]
+            datasets: [
+                {
+                    label: 'Point1',
+                    data: timeDataPoint1,
+                    borderColor: 'red',
+                    backgroundColor: 'red',
+                },
+                {
+                    label: 'Point2',
+                    data: timeDataPoint2,
+                    borderColor: 'blue',
+                    backgroundColor: 'blue',
+                },
+                {
+                    label: 'Point3',
+                    data: timeDataPoint3,
+                    borderColor: 'green',
+                    backgroundColor: 'green',
+                },
+                {
+                    label: 'Point4',
+                    data: timeDataPoint4,
+                    borderColor: 'yellow',
+                    backgroundColor: 'yellow',
+                }
+            ]
         },
         options: {
             scales: {
@@ -106,7 +154,18 @@
         })
         .then(response => response.json())
         .then(data => {
-            compareChart.data.datasets[0].data = formatToTimeSeries(data.labels, data.value);
+            compareChart.data.datasets.forEach((dataset, index) => {
+                const pointNum = index + 1;
+                
+                const matchData = data.charts.find(item => item.point == pointNum);
+
+                if (matchData) {
+                    dataset.data = formatToTimeSeries(matchData.labels, matchData.values)
+                } else {
+                    dataset.data = [];
+                }
+            })
+
             compareChart.update();
         })
         .catch(error => { console.error(error); });
