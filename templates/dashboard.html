@@ -1,200 +1,376 @@
-<<<<<<< Updated upstream
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
-{% block header %}
-{% include "header.html" %}
-{% endblock %}
+
 {% block content %}
+<style>
+    /* 전체 대시보드 레이아웃 (밝은 라이트 테마) */
+    body {
+        background-color: #f8fafc !important;
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .dashboard-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* 1. 상단 타이틀 & 헤더 영역 */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 24px;
+    }
+
+    .title-area h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 0 6px 0;
+        color: #0f172a;
+    }
+
+    .title-area p {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .status-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .time-badge {
+        font-size: 0.85rem;
+        color: #64748b;
+        background: #ffffff;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .system-badge {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #16a34a;
+        background: #dcfce7;
+        padding: 6px 14px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .system-badge::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #16a34a;
+        border-radius: 50%;
+    }
+
+    /* 2. 카드 그리드 레이아웃 (한 줄에 2개씩 배치) */
+    .dashboard-card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* 각 공통 스마트 카드 */
+    .smart-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 24px 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 170px;
+        box-sizing: border-box;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .smart-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 카드 상단 (아이콘 + 제목 + 큰 수치) */
+    .card-top {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .card-icon {
+        font-size: 2.2rem;
+    }
+
+    .card-info-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sensor-name {
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .sensor-value-box {
+        display: flex;
+        align-items: baseline;
+    }
+
+    .sensor-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .sensor-unit {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-left: 4px;
+    }
+
+    /* 카드 하단 */
+    .card-bottom {
+        margin-top: 16px;
+    }
+
+    .sparkline-box {
+        height: 45px;
+        width: 100%;
+    }
+
+    /* 배터리 전용 프로그래스 바 */
+    .battery-bar-bg {
+        background: #e2e8f0;
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-top: 12px;
+    }
+
+    .battery-bar-fill {
+        background: #16a34a;
+        height: 100%;
+        width: 78%;
+        border-radius: 6px;
+    }
+
+    /* 시스템 전원 전용 태그 */
+    .power-tag {
+        background: #dcfce7;
+        color: #15803d;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 8px;
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 640px) {
+        .dashboard-card-grid { grid-template-columns: 1fr; }
+        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+</style>
 <div class="dashboard-container">
-    <div class="chart-grid">
-        {% for chart in charts %}
-        <div class="chart-box">
-            <div class="card-header">
-                <h3>
-                    {{ chart.device_name }}
-                    <span style="font-size: 0.85rem; color: #64748b; font-weight: normal;">
-                        ({% if chart.value_code == 'temp' %}온도
-                         {% elif chart.value_code == 'hum' %}습도
-                         {% elif chart.value_code == 'co2' %}CO2
-                         {% elif chart.value_code == 'dust' %}미세먼지
-                         {% else %}{{ chart.value_code }}{% endif %})
-                    </span>
-                </h3>
-                
-                <!-- value_code 경로로 직접 이동 (/temp, /hum, /co2, /dust, /pm25) -->
-                <a href="/{{ chart.value_code }}" class="btn-detail">상세보기 &rarr;</a>
+    <!-- 상단 대시보드 타이틀 & 시스템 상태 -->
+    <div class="dashboard-header">
+        <div class="title-area">
+            <h1>이동형 환경 데이터 수집 대시보드</h1>
+            <p>라인트레이서 로봇 기반 실시간 모니터링</p>
+        </div>
+        <div class="status-area">
+            <div class="time-badge">
+                📅 <span id="clockDisplay">로딩 중...</span>
             </div>
-            
-            <div style="position: relative; height: 240px;">
-                <!-- Canvas ID 중복 방지를 위해 device_seq와 value_code 조합 -->
-                <canvas id="chart-{{ chart.device_seq }}-{{ chart.value_code }}"></canvas>
+            <div class="system-badge">
+                시스템 정상
             </div>
         </div>
-        {% else %}
-        <p style="text-align: center; grid-column: 1/-1; color: #94a3b8; padding: 40px;">등록된 센서 데이터가 없습니다.</p>
-        {% endfor %}
+    </div>
+
+    <!-- 6개 스마트 카드 영역 (2컬럼 구조) -->
+    <div class="dashboard-card-grid">
+        
+        <!-- 1. 온도 카드 -->
+        <a href="/temp" class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">🌡️</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">온도</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value" id="val-temp">--</span>
+                        <span class="sensor-unit">°C</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <div class="sparkline-box">
+                    <canvas id="spark-temp"></canvas>
+                </div>
+            </div>
+        </a>
+
+        <!-- 2. 습도 카드 -->
+        <a href="/hum" class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">💧</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">습도</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value" id="val-hum">--</span>
+                        <span class="sensor-unit">%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <div class="sparkline-box">
+                    <canvas id="spark-hum"></canvas>
+                </div>
+            </div>
+        </a>
+
+        <!-- 3. 미세먼지 카드 -->
+        <a href="/dust" class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">⚛️</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">미세먼지</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value" id="val-dust">--</span>
+                        <span class="sensor-unit">µg/m³</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <div class="sparkline-box">
+                    <canvas id="spark-dust"></canvas>
+                </div>
+            </div>
+        </a>
+
+        <!-- 4. CO2 카드 -->
+        <a href="/co2" class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">☁️</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">CO2</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value" id="val-co2">--</span>
+                        <span class="sensor-unit">ppm</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <div class="sparkline-box">
+                    <canvas id="spark-co2"></canvas>
+                </div>
+            </div>
+        </a>
+
+        <!-- 5. 배터리 상태 카드 -->
+        <div class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">🔋</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">배터리 상태</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value">78</span>
+                        <span class="sensor-unit">%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <div class="battery-bar-bg">
+                    <div class="battery-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 로봇 전원 상태 카드 -->
+        <div class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">🔌</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">로봇 전원 상태</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value" style="color: #16a34a;">ON</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <span class="power-tag">정상 작동 중</span>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
 
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 
 <script>
-    const chartsData = {{ charts | tojson | safe }};
+    // 1. 실시간 시계 스크립트
+    function updateClock() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const date = String(now.getDate()).padStart(2, '0');
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        const dayName = days[now.getDay()];
 
-    function formatToTimeSeries(labels, values) {
-        if (!labels || !values) return [];
-        return labels.map((label, idx) => ({
-            x: label,
-            y: values[idx]
-        }));
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        document.getElementById('clockDisplay').innerText = 
+            `${year}-${month}-${date} (${dayName}) ${hours}:${minutes}:${seconds}`;
     }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    if (Array.isArray(chartsData)) {
-        chartsData.forEach(item => {
-            // JS에서도 device_seq와 value_code 조합으로 ID를 조회
-            const canvasId = `chart-${item.device_seq}-${item.value_code}`;
-            const ctx = document.getElementById(canvasId);
-            if (!ctx) return;
-
-            const timeData = formatToTimeSeries(item.labels, item.values);
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        label: `${item.device_name} (${item.value_code})`,
-                        data: timeData,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                        borderWidth: 2,
-                        tension: 0.35,
-                        fill: true,
-                        pointBackgroundColor: '#2563eb',
-                        pointRadius: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                parser: 'HH:mm',
-                                unit: 'hour',
-                                displayFormats: { hour: 'HH:mm' }
-                            },
-                            min: '00:00',
-                            max: '23:59',
-                            grid: { display: false }
-                        },
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: '#f1f5f9' }
+    // 2. /api/sensors 호출하여 실시간 데이터 수신 및 반영
+    function fetchSensorData() {
+        fetch('/api/sensors')
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    data.forEach(item => {
+                        // value_code 기반 (temp, hum, dust, pm25, co2 등) 아이디 찾기
+                        const targetCode = item.value_code === 'pm25' ? 'dust' : item.value_code;
+                        const valElem = document.getElementById(`val-${targetCode}`);
+                        
+                        if (valElem && item.value !== null) {
+                            valElem.innerText = item.value;
                         }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
+                    });
                 }
-            });
-        });
+            })
+            .catch(error => console.error("API 데이터 로드 실패:", error));
     }
+
+    // 초기 실행 및 2초 주기 자동 요청
+    fetchSensorData();
+    setInterval(fetchSensorData, 2000);
 </script>
 {% endblock %}
-=======
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장비 모니터링 대시보드</title>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-
-    <header>
-        <h1> 장비 모니터링 대시보드</h1>
-        <nav>
-            <a href="/dashboard" class="active">전체 대시보드</a>
-            <a href="/temp">온도</a>
-            <a href="/hum">습도</a>
-            <a href="/dust">미세먼지</a>
-            <a href="/co2">CO2</a>
-        </nav>
-    </header>
-
-    <main class="grid-container">
-        {% for chart in charts %}
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">{{ chart.device_name }}</span>
-                {% if chart.device_seq == 1 %}
-                    <a href="/temp" class="btn-detail">상세보기 &rarr;</a>
-                {% elif chart.device_seq == 2 %}
-                    <a href="/hum" class="btn-detail">상세보기 &rarr;</a>
-                {% elif chart.device_seq == 3 %}
-                    <a href="/dust" class="btn-detail">상세보기 &rarr;</a>
-                {% elif chart.device_seq == 4 %}
-                    <a href="/co2" class="btn-detail">상세보기 &rarr;</a>
-                {% else %}
-                    <a href="#" class="btn-detail">상세보기 &rarr;</a>
-                {% endif %}
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="chart-{{ chart.device_seq }}"></canvas>
-            </div>
-        </div>
-        {% else %}
-        <div class="empty-msg">현재 표시할 장비 데이터가 없습니다.</div>
-        {% endfor %}
-    </main>
-
-    <script>
-        // safe 필터를 추가하여 HTML 이스케이프 방지
-        const chartsData = {{ charts | tojson | safe }};
-
-        if (Array.isArray(chartsData)) {
-            chartsData.forEach(item => {
-                const ctx = document.getElementById(`chart-${item.device_seq}`);
-                if (!ctx) return;
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: item.labels,
-                        datasets: [{
-                            label: `${item.device_name} 시간별 평균`,
-                            data: item.values,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.35,
-                            pointBackgroundColor: '#2563eb',
-                            pointRadius: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                            x: { grid: { display: false } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            });
-        }
-    </script>
-
-</body>
-</html>
->>>>>>> Stashed changes
