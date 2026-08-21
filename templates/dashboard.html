@@ -3,26 +3,34 @@
 
 {% block content %}
 <style>
-    /* 전체 대시보드 레이아웃 (밝은 라이트 테마) */
+    /* 감성적인 자연 배경 + 글래스모피즘 오버레이 */
     body {
-        background-color: #f8fafc !important;
+        background: linear-gradient(rgba(248, 250, 252, 0.8), rgba(248, 250, 252, 0.88)),
+                    url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
+        background-size: cover !important;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
         color: #1e293b;
         margin: 0;
     }
 
     .dashboard-container {
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 30px 20px;
     }
 
-    /* 1. 상단 타이틀 & 헤더 영역 */
+    /* 상단 헤더 */
     .dashboard-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
         margin-bottom: 24px;
+        padding: 20px 24px;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     }
 
     .title-area h1 {
@@ -46,14 +54,12 @@
 
     .time-badge {
         font-size: 0.85rem;
-        color: #64748b;
-        background: #ffffff;
-        padding: 6px 12px;
-        border-radius: 8px;
+        color: #475569;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px 14px;
+        border-radius: 10px;
         border: 1px solid #e2e8f0;
-        display: flex;
-        align-items: center;
-        gap: 6px;
+        font-weight: 600;
     }
 
     .system-badge {
@@ -61,7 +67,7 @@
         font-weight: 700;
         color: #16a34a;
         background: #dcfce7;
-        padding: 6px 14px;
+        padding: 8px 16px;
         border-radius: 20px;
         display: flex;
         align-items: center;
@@ -77,56 +83,63 @@
         border-radius: 50%;
     }
 
-    /* 2. 카드 그리드 레이아웃 (한 줄에 2개씩 배치) */
-    .dashboard-card-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+    .section-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #334155;
+        margin: 28px 0 14px 0;
     }
 
-    /* 각 공통 스마트 카드 */
+    .env-card-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    /* 로봇 상태 및 위치 카드 (가로 3개 배치) */
+    .status-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
     .smart-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 24px 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 22px 18px;
+        box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.04);
         text-decoration: none;
         color: inherit;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 170px;
         box-sizing: border-box;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.25s ease;
+        min-height: 140px;
     }
 
     .smart-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px -4px rgba(0, 0, 0, 0.08);
+        background: rgba(255, 255, 255, 0.95);
     }
 
-    /* 카드 상단 (아이콘 + 제목 + 큰 수치) */
     .card-top {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 14px;
     }
 
     .card-icon {
         font-size: 2.2rem;
     }
 
-    .card-info-text {
-        display: flex;
-        flex-direction: column;
-    }
-
     .sensor-name {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: #64748b;
         font-weight: 600;
-        margin-bottom: 2px;
     }
 
     .sensor-value-box {
@@ -135,33 +148,22 @@
     }
 
     .sensor-value {
-        font-size: 2rem;
+        font-size: 1.85rem;
         font-weight: 800;
         color: #0f172a;
     }
 
     .sensor-unit {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         font-weight: 600;
         color: #64748b;
         margin-left: 4px;
     }
 
-    /* 카드 하단 */
-    .card-bottom {
-        margin-top: 16px;
-    }
-
-    .sparkline-box {
-        height: 45px;
-        width: 100%;
-    }
-
-    /* 배터리 전용 프로그래스 바 */
     .battery-bar-bg {
         background: #e2e8f0;
-        height: 12px;
-        border-radius: 6px;
+        height: 10px;
+        border-radius: 5px;
         overflow: hidden;
         margin-top: 12px;
     }
@@ -170,29 +172,57 @@
         background: #16a34a;
         height: 100%;
         width: 78%;
+        border-radius: 5px;
+    }
+
+    .diff-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 8px;
         border-radius: 6px;
     }
+    .diff-up { color: #ef4444; background-color: #fef2f2; }
+    .diff-down { color: #3b82f6; background-color: #eff6ff; }
+    .diff-same { color: #94a3b8; background-color: #f8fafc; }
 
-    /* 시스템 전원 전용 태그 */
-    .power-tag {
-        background: #dcfce7;
-        color: #15803d;
-        font-size: 0.8rem;
+    .status-tag {
+        font-size: 0.75rem;
         font-weight: 700;
-        padding: 6px 12px;
-        border-radius: 12px;
+        padding: 4px 10px;
+        border-radius: 10px;
+    }
+    .tag-green { background: #dcfce7; color: #15803d; }
+    .tag-blue { background: #dbeafe; color: #1d4ed8; }
+
+    /* 로봇 위치 깜빡이는 포인트 도트 애니메이션 */
+    .location-pulse {
         display: inline-block;
-        margin-top: 8px;
+        width: 8px;
+        height: 8px;
+        background-color: #2563eb;
+        border-radius: 50%;
+        margin-right: 6px;
+        animation: pulse 1.5s infinite;
     }
 
-    /* 모바일 반응형 */
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(37, 99, 235, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    @media (max-width: 1024px) {
+        .env-card-grid { grid-template-columns: repeat(2, 1fr); }
+        .status-card-grid { grid-template-columns: repeat(1, 1fr); }
+    }
     @media (max-width: 640px) {
-        .dashboard-card-grid { grid-template-columns: 1fr; }
+        .env-card-grid, .status-card-grid { grid-template-columns: 1fr; }
         .dashboard-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     }
 </style>
+
 <div class="dashboard-container">
-    <!-- 상단 대시보드 타이틀 & 시스템 상태 -->
+    <!-- 1. 헤더 영역 -->
     <div class="dashboard-header">
         <div class="title-area">
             <h1>이동형 환경 데이터 수집 대시보드</h1>
@@ -208,10 +238,9 @@
         </div>
     </div>
 
-    <!-- 6개 스마트 카드 영역 (2컬럼 구조) -->
-    <div class="dashboard-card-grid">
-        
-        <!-- 1. 온도 카드 -->
+    <!-- 2. 실시간 종합 환경 데이터 (가로 4개) -->
+    <div class="section-title">📊 실시간 종합 환경 데이터</div>
+    <div class="env-card-grid">
         <a href="/temp" class="smart-card">
             <div class="card-top">
                 <div class="card-icon">🌡️</div>
@@ -223,14 +252,11 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom">
-                <div class="sparkline-box">
-                    <canvas id="spark-temp"></canvas>
-                </div>
+            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+                <span class="diff-badge diff-same" id="diff-temp">- 0.0°C</span>
             </div>
         </a>
 
-        <!-- 2. 습도 카드 -->
         <a href="/hum" class="smart-card">
             <div class="card-top">
                 <div class="card-icon">💧</div>
@@ -242,14 +268,11 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom">
-                <div class="sparkline-box">
-                    <canvas id="spark-hum"></canvas>
-                </div>
+            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+                <span class="diff-badge diff-same" id="diff-hum">- 0.0%</span>
             </div>
         </a>
 
-        <!-- 3. 미세먼지 카드 -->
         <a href="/dust" class="smart-card">
             <div class="card-top">
                 <div class="card-icon">⚛️</div>
@@ -261,14 +284,11 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom">
-                <div class="sparkline-box">
-                    <canvas id="spark-dust"></canvas>
-                </div>
+            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+                <span class="diff-badge diff-same" id="diff-dust">- 0.0µg/m³</span>
             </div>
         </a>
 
-        <!-- 4. CO2 카드 -->
         <a href="/co2" class="smart-card">
             <div class="card-top">
                 <div class="card-icon">☁️</div>
@@ -280,14 +300,17 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom">
-                <div class="sparkline-box">
-                    <canvas id="spark-co2"></canvas>
-                </div>
+            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+                <span class="diff-badge diff-same" id="diff-co2">- 0.0ppm</span>
             </div>
         </a>
+    </div>
 
-        <!-- 5. 배터리 상태 카드 -->
+    <!-- 3. 로봇 장비 및 이동형 실시간 위치 상태 카드 (가로 3개) -->
+    <div class="section-title">🤖 로봇 장비 및 위치 상태</div>
+    <div class="status-card-grid">
+        
+        <!-- 배터리 상태 -->
         <div class="smart-card">
             <div class="card-top">
                 <div class="card-icon">🔋</div>
@@ -306,7 +329,7 @@
             </div>
         </div>
 
-        <!-- 6. 로봇 전원 상태 카드 -->
+        <!-- 로봇 전원 상태 -->
         <div class="smart-card">
             <div class="card-top">
                 <div class="card-icon">🔌</div>
@@ -318,7 +341,23 @@
                 </div>
             </div>
             <div class="card-bottom">
-                <span class="power-tag">정상 작동 중</span>
+                <span class="status-tag tag-green">정상 작동 중</span>
+            </div>
+        </div>
+
+        <!-- 이동형 현재 위치(Point) 카드 -->
+        <div class="smart-card">
+            <div class="card-top">
+                <div class="card-icon">📍</div>
+                <div class="card-info-text">
+                    <span class="sensor-name">현재 로봇 수집 위치</span>
+                    <div class="sensor-value-box">
+                        <span class="sensor-value" id="current-point-val" style="color: #2563eb;">Point 2</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-bottom">
+                <span class="status-tag tag-blue"><i class="location-pulse"></i>라인 주행 중</span>
             </div>
         </div>
 
@@ -327,10 +366,8 @@
 {% endblock %}
 
 {% block script %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-    // 1. 실시간 시계 스크립트
+    // 1. 실시간 시계
     function updateClock() {
         const now = new Date();
         const year = now.getFullYear();
@@ -349,27 +386,54 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 2. /api/sensors 호출하여 실시간 데이터 수신 및 반영
+    // 2. 변동폭 배지 업데이트
+    function updateDiffBadge(badgeId, diffVal, unitStr) {
+        const elem = document.getElementById(badgeId);
+        if (!elem) return;
+
+        if (diffVal > 0) {
+            elem.className = "diff-badge diff-up";
+            elem.innerText = `▲ ${diffVal}${unitStr}`;
+        } else if (diffVal < 0) {
+            elem.className = "diff-badge diff-down";
+            elem.innerText = `▼ ${Math.abs(diffVal)}${unitStr}`;
+        } else {
+            elem.className = "diff-badge diff-same";
+            elem.innerText = `- 0.0${unitStr}`;
+        }
+    }
+
+    // 3. API 실시간 수치 및 로봇 현재 위치(Point) 연동
     function fetchSensorData() {
         fetch('/api/sensors')
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {
+                    const unitMap = { 'temp': '°C', 'hum': '%', 'dust': 'µg/m³', 'co2': 'ppm' };
+
                     data.forEach(item => {
-                        // value_code 기반 (temp, hum, dust, pm25, co2 등) 아이디 찾기
                         const targetCode = item.value_code === 'pm25' ? 'dust' : item.value_code;
-                        const valElem = document.getElementById(`val-${targetCode}`);
                         
+                        const valElem = document.getElementById(`val-${targetCode}`);
                         if (valElem && item.value !== null) {
                             valElem.innerText = item.value;
+                        }
+
+                        const unit = unitMap[targetCode] || '';
+                        if (item.diff !== undefined) {
+                            updateDiffBadge(`diff-${targetCode}`, item.diff, unit);
+                        }
+
+                        // DB 수집 데이터의 recorded_point 값 연동
+                        if (item.recorded_point) {
+                            const pointElem = document.getElementById('current-point-val');
+                            if (pointElem) pointElem.innerText = `Point ${item.recorded_point}`;
                         }
                     });
                 }
             })
-            .catch(error => console.error("API 데이터 로드 실패:", error));
+            .catch(error => console.error("API 연동 오류:", error));
     }
-
-    // 초기 실행 및 2초 주기 자동 요청
     fetchSensorData();
     setInterval(fetchSensorData, 2000);
 </script>

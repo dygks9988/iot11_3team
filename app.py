@@ -101,45 +101,37 @@ def get_sensor_chart(device_seq, value_name, selected_date=None):
                 func.minute(DeviceLog.recorded_at)
             )
             .order_by(
-                DeviceLog.recorded_point,
                 func.hour(DeviceLog.recorded_at),
-                func.minute(DeviceLog.recorded_at)
+                func.minute(DeviceLog.recorded_at),
+                DeviceLog.recorded_point
             )
         )
 
         rows = db_session.execute(stmt).all()
 
-        charts = []
-
-        for point in range(1, 5):
-
-            point_rows = [
-                row for row in rows
-                if row.point == point
+        return {
+            "labels": [
+                f"{row.hour:02d}:{row.minute:02d}"
+                for row in rows
+            ],
+            "values": [
+                float(row.value)
+                for row in rows
+            ],
+            "points": [
+                row.point
+                for row in rows
             ]
-            charts.append({
-                "point": point,
-
-                "labels": [
-                    f"{row.hour:02d}:{row.minute:02d}"
-                    for row in point_rows
-                ],
-                "values": [
-                    float(row.value)
-                    for row in point_rows
-                ]
-            })
-
-        return charts
+        }
 
 @app.get("/temp")
 def temp():
 
-    charts = get_sensor_chart(1, "temp")
+    chart = get_sensor_chart(1, "temp")
 
     return render_template(
         "temp.html",
-        charts=charts
+        chart=chart
     )
 
 @app.post("/api/temp")
@@ -147,22 +139,22 @@ def temp_chart_date():
 
     selected_date = request.get_json()["date"]
 
-    charts = get_sensor_chart(
+    chart = get_sensor_chart(
         1,
         "temp",
         selected_date
     )
 
-    return jsonify(charts=charts)
+    return jsonify(chart=chart)
 
 @app.get("/hum")
 def hum():
 
-    charts = get_sensor_chart(1, "hum")
+    chart = get_sensor_chart(1, "hum")
 
     return render_template(
         "hum.html",
-        charts=charts
+        chart=chart
     )
 
 @app.post("/api/hum")
@@ -170,21 +162,21 @@ def hum_chart_date():
 
     selected_date = request.get_json()["date"]
 
-    charts = get_sensor_chart(
+    chart = get_sensor_chart(
         1,
         "hum",
         selected_date
     )
 
-    return jsonify(charts=charts)
+    return jsonify(chart=chart)
 @app.get("/dust")
 def dust():
 
-    charts = get_sensor_chart(2, "dust")
+    chart = get_sensor_chart(2, "dust")
 
     return render_template(
         "dust.html",
-        charts=charts
+        chart=chart
     )
 
 @app.post("/api/dust")
@@ -192,26 +184,22 @@ def dustchart_date():
 
     selected_date = request.get_json()["date"]
 
-    charts = get_sensor_chart(
+    chart = get_sensor_chart(
         2,
-<<<<<<< HEAD
         "dust",
-=======
-        "dust.html",
->>>>>>> 2aabcd3 (style.css 업데이트)
         selected_date
     )
 
-    return jsonify(charts=charts)
+    return jsonify(chart=chart)
 
 @app.get("/co2")
 def co2():
 
-    charts = get_sensor_chart(3, "co2")
+    chart = get_sensor_chart(3, "co2")
 
     return render_template(
         "co2.html",
-        charts=charts
+        chart=chart
     )
 
 @app.post("/api/co2")
@@ -219,13 +207,13 @@ def co2_chart_date():
 
     selected_date = request.get_json()["date"]
 
-    charts = get_sensor_chart(
+    chart = get_sensor_chart(
         3,
         "co2",
         selected_date
     )
 
-    return jsonify(charts=charts)
+    return jsonify(chart=chart)
 
 
 if __name__ == "__main__" :
