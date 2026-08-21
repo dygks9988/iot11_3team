@@ -38,12 +38,25 @@
             type: 'line',
             data: {
                 datasets: [{
-                    label: '습도 (%)',
                     data: datas,
                 }]
             },
             options: {
                 plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: '습도 (%)',
+                        align: 'start',
+                        padding: {
+                            bottom: 10
+                        },
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
                     tooltip: {
                         callbacks: {
                             title: function(context) {

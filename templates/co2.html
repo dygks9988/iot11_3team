@@ -45,6 +45,20 @@
             },
             options: {
                 plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'CO2 (ppm)',
+                        align: 'start',
+                        padding: {
+                            bottom: 10
+                        },
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
                     tooltip: {
                         callbacks: {
                             title: function(context) {
