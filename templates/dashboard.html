@@ -1,12 +1,10 @@
+
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <style>
-    /* 감성적인 자연 배경 + 글래스모피즘 오버레이 */
-<<<<<<< HEAD
-   
-=======
+    /* 💡 이전의 감성적인 자연 배경 + 글래스모피즘 오버레이 복구 */
     body {
         background: linear-gradient(rgba(248, 250, 252, 0.8), rgba(248, 250, 252, 0.88)),
                     url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
@@ -16,7 +14,6 @@
         margin: 0;
     }
 
->>>>>>> 16fbac806b95cadf48e21ae87313185b3bb964c2
     .dashboard-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -28,7 +25,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         padding: 20px 24px;
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(12px);
@@ -87,11 +84,26 @@
         border-radius: 50%;
     }
 
+    .alert-banner {
+        display: none;
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        color: #991b1b;
+        padding: 12px 20px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);
+    }
+
     .section-title {
         font-size: 1.05rem;
         font-weight: 700;
         color: #334155;
-        margin: 28px 0 14px 0;
+        margin: 24px 0 14px 0;
     }
 
     .env-card-grid {
@@ -100,7 +112,6 @@
         gap: 16px;
     }
 
-    /* 로봇 상태 및 위치 카드 (가로 3개 배치) */
     .status-card-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -108,6 +119,7 @@
     }
 
     .smart-card {
+        position: relative;
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.9);
@@ -121,13 +133,27 @@
         justify-content: space-between;
         box-sizing: border-box;
         transition: all 0.25s ease;
-        min-height: 140px;
+        min-height: 145px;
     }
 
     .smart-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 12px 25px -4px rgba(0, 0, 0, 0.08);
         background: rgba(255, 255, 255, 0.95);
+    }
+
+    .link-arrow {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        font-size: 0.85rem;
+        color: #94a3b8;
+        transition: color 0.2s, transform 0.2s;
+    }
+
+    .smart-card:hover .link-arrow {
+        color: #2563eb;
+        transform: translate(2px, -2px);
     }
 
     .card-top {
@@ -164,11 +190,19 @@
         margin-left: 4px;
     }
 
+    .card-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+    }
+
     .battery-bar-bg {
         background: #e2e8f0;
         height: 10px;
         border-radius: 5px;
         overflow: hidden;
+        width: 100%;
         margin-top: 12px;
     }
 
@@ -198,21 +232,101 @@
     .tag-green { background: #dcfce7; color: #15803d; }
     .tag-blue { background: #dbeafe; color: #1d4ed8; }
 
-    /* 로봇 위치 깜빡이는 포인트 도트 애니메이션 */
-    .location-pulse {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        background-color: #2563eb;
-        border-radius: 50%;
-        margin-right: 6px;
-        animation: pulse 1.5s infinite;
+    .air-status {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 8px;
+    }
+    .air-good { background: #dcfce7; color: #16a34a; }
+    .air-normal { background: #fef9c3; color: #ca8a04; }
+    .air-bad { background: #fee2e2; color: #dc2626; }
+
+    /* 💡 [수정] 박스 크기를 더 넓고 큼직하게 키운 트랙 UI 스타일 */
+    .route-map-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 32px 24px;
+        box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.04);
+        margin-top: 10px;
     }
 
-    @keyframes pulse {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(37, 99, 235, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    .dense-track-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .dense-node-box {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #cbd5e1;
+        border-radius: 18px;
+        padding: 20px 36px; /* 💡 박스 내부 패딩 확대로 크기 증대 */
+        transition: all 0.3s ease;
+        min-width: 150px;    /* 💡 최소 너비 확대 */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .dense-node-box .point-title-text {
+        font-size: 1.15rem; /* 💡 글자 크기 확대 */
+        font-weight: 800;
+        color: #475569;
+    }
+
+    .dense-node-box .point-sub-text {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        margin-top: 4px;
+        font-weight: 600;
+    }
+
+    .track-arrow {
+        font-size: 1.2rem;
+        color: #3b82f6;
+        font-weight: 900;
+        padding: 0 4px;
+    }
+
+    /* 활성화된 로봇 포인트 박스 (강조 스타일) */
+    .dense-node-box.active {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        transform: translateY(-4px) scale(1.05);
+        z-index: 5;
+    }
+
+    .dense-node-box.active .point-title-text {
+        color: #2563eb;
+    }
+
+    .dense-node-box.active .point-sub-text {
+        color: #3b82f6;
+    }
+
+    .active-robot-tag {
+        display: none;
+        position: absolute;
+        top: -14px;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 3px 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    .dense-node-box.active .active-robot-tag {
+        display: block;
     }
 
     @media (max-width: 1024px) {
@@ -222,6 +336,9 @@
     @media (max-width: 640px) {
         .env-card-grid, .status-card-grid { grid-template-columns: 1fr; }
         .dashboard-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .dense-track-container { flex-direction: column; gap: 12px; }
+        .dense-node-box { width: 100%; }
+        .track-arrow { transform: rotate(90deg); }
     }
 </style>
 
@@ -242,10 +359,16 @@
         </div>
     </div>
 
+    <!-- 이상 수치 알림 배너 -->
+    <div class="alert-banner" id="alertBanner">
+        <span>⚠️ 경고:</span> <span id="alertText">환경 요소 수치가 위험 범주를 초과했습니다.</span>
+    </div>
+
     <!-- 2. 실시간 종합 환경 데이터 (가로 4개) -->
     <div class="section-title">📊 실시간 종합 환경 데이터</div>
     <div class="env-card-grid">
         <a href="/temp" class="smart-card">
+            <span class="link-arrow">↗</span>
             <div class="card-top">
                 <div class="card-icon">🌡️</div>
                 <div class="card-info-text">
@@ -256,12 +379,14 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+            <div class="card-bottom">
+                <span class="air-status air-good" id="status-temp">🟢 적정</span>
                 <span class="diff-badge diff-same" id="diff-temp">- 0.0°C</span>
             </div>
         </a>
 
         <a href="/hum" class="smart-card">
+            <span class="link-arrow">↗</span>
             <div class="card-top">
                 <div class="card-icon">💧</div>
                 <div class="card-info-text">
@@ -272,12 +397,14 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+            <div class="card-bottom">
+                <span class="air-status air-good" id="status-hum">🟢 쾌적</span>
                 <span class="diff-badge diff-same" id="diff-hum">- 0.0%</span>
             </div>
         </a>
 
         <a href="/dust" class="smart-card">
+            <span class="link-arrow">↗</span>
             <div class="card-top">
                 <div class="card-icon">⚛️</div>
                 <div class="card-info-text">
@@ -288,12 +415,14 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+            <div class="card-bottom">
+                <span class="air-status air-good" id="status-dust">🟢 좋음</span>
                 <span class="diff-badge diff-same" id="diff-dust">- 0.0µg/m³</span>
             </div>
         </a>
 
         <a href="/co2" class="smart-card">
+            <span class="link-arrow">↗</span>
             <div class="card-top">
                 <div class="card-icon">☁️</div>
                 <div class="card-info-text">
@@ -304,17 +433,17 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom" style="display: flex; justify-content: flex-end;">
+            <div class="card-bottom">
+                <span class="air-status air-good" id="status-co2">🟢 원활</span>
                 <span class="diff-badge diff-same" id="diff-co2">- 0.0ppm</span>
             </div>
         </a>
     </div>
 
-    <!-- 3. 로봇 장비 및 이동형 실시간 위치 상태 카드 (가로 3개) -->
-    <div class="section-title">🤖 로봇 장비 및 위치 상태</div>
+    <!-- 3. 💡 [수정] 중복되던 위치 카드 대신 '통신 연결 상태' 카드로 연동 -->
+    <div class="section-title">🤖 로봇 장비 및 관제 상태</div>
     <div class="status-card-grid">
-        
-        <!-- 배터리 상태 -->
+        <!-- 배터리 카드 -->
         <div class="smart-card">
             <div class="card-top">
                 <div class="card-icon">🔋</div>
@@ -333,7 +462,7 @@
             </div>
         </div>
 
-        <!-- 로봇 전원 상태 -->
+        <!-- 전원 카드 -->
         <div class="smart-card">
             <div class="card-top">
                 <div class="card-icon">🔌</div>
@@ -344,28 +473,68 @@
                     </div>
                 </div>
             </div>
-            <div class="card-bottom">
+            <div class="card-bottom" style="justify-content: flex-start;">
                 <span class="status-tag tag-green">정상 작동 중</span>
             </div>
         </div>
 
-        <!-- 이동형 현재 위치(Point) 카드 -->
+        <!-- 💡 [대체] 실시간 수신 통신 상태 카드 -->
         <div class="smart-card">
             <div class="card-top">
-                <div class="card-icon">📍</div>
+                <div class="card-icon">📡</div>
                 <div class="card-info-text">
-                    <span class="sensor-name">현재 로봇 수집 위치</span>
+                    <span class="sensor-name">데이터 수신 상태</span>
                     <div class="sensor-value-box">
-                        <span class="sensor-value" id="current-point-val" style="color: #2563eb;">Point 2</span>
+                        <span class="sensor-value" style="color: #2563eb;">Online</span>
                     </div>
                 </div>
             </div>
-            <div class="card-bottom">
-                <span class="status-tag tag-blue"><i class="location-pulse"></i>라인 주행 중</span>
+            <div class="card-bottom" style="justify-content: flex-start;">
+                <span class="status-tag tag-blue">실시간 수신 중 (2초 주기)</span>
             </div>
         </div>
-
     </div>
+
+    <!-- 4. 💡 [수정] 박스 크기를 더 크게 키운 라인트레이서 순환 주행 트랙 -->
+    <div class="section-title">🗺️ 라인트레이서 실시간 순환 주행 트랙</div>
+    <div class="route-map-card">
+        <div class="dense-track-container">
+            
+            <div class="dense-node-box" id="map-pt1">
+                <span class="active-robot-tag">🤖 수집 중</span>
+                <span class="point-title-text">Point 1</span>
+                <span class="point-sub-text">A 지점</span>
+            </div>
+
+            <span class="track-arrow">➔</span>
+
+            <div class="dense-node-box active" id="map-pt2">
+                <span class="active-robot-tag">🤖 수집 중</span>
+                <span class="point-title-text">Point 2</span>
+                <span class="point-sub-text">B 지점</span>
+            </div>
+
+            <span class="track-arrow">➔</span>
+
+            <div class="dense-node-box" id="map-pt3">
+                <span class="active-robot-tag">🤖 수집 중</span>
+                <span class="point-title-text">Point 3</span>
+                <span class="point-sub-text">C 지점</span>
+            </div>
+
+            <span class="track-arrow">➔</span>
+
+            <div class="dense-node-box" id="map-pt4">
+                <span class="active-robot-tag">🤖 수집 중</span>
+                <span class="point-title-text">Point 4</span>
+                <span class="point-sub-text">D 지점</span>
+            </div>
+
+            <span class="track-arrow">➔ (A지점 순환)</span>
+
+        </div>
+    </div>
+
 </div>
 {% endblock %}
 
@@ -407,13 +576,57 @@
         }
     }
 
-    // 3. API 실시간 수치 및 로봇 현재 위치(Point) 연동
+    // 3. 공기질 상태 평가
+    function updateAirStatus(sensorCode, value) {
+        const elem = document.getElementById(`status-${sensorCode}`);
+        if (!elem || value === null) return;
+
+        let label = "🟢 좋음";
+        let cssClass = "air-status air-good";
+
+        if (sensorCode === 'dust') {
+            if (value > 80) { label = "🔴 위험"; cssClass = "air-status air-bad"; }
+            else if (value > 35) { label = "🟡 보통"; cssClass = "air-status air-normal"; }
+            else { label = "🟢 좋음"; }
+        } else if (sensorCode === 'co2') {
+            if (value > 1000) { label = "🔴 환기 필요"; cssClass = "air-status air-bad"; }
+            else if (value > 700) { label = "🟡 보통"; cssClass = "air-status air-normal"; }
+            else { label = "🟢 원활"; }
+        } else if (sensorCode === 'temp') {
+            if (value > 30 || value < 15) { label = "🟡 주의"; cssClass = "air-status air-normal"; }
+            else { label = "🟢 적정"; }
+        } else if (sensorCode === 'hum') {
+            if (value > 70 || value < 30) { label = "🟡 주의"; cssClass = "air-status air-normal"; }
+            else { label = "🟢 쾌적"; }
+        }
+
+        elem.className = cssClass;
+        elem.innerText = label;
+    }
+
+    // 4. 순환 트랙 위치 활성화 처리
+    function updateRouteMap(pointNum) {
+        for (let i = 1; i <= 4; i++) {
+            const mapPoint = document.getElementById(`map-pt${i}`);
+            if (mapPoint) {
+                if (i === pointNum) {
+                    mapPoint.classList.add('active');
+                } else {
+                    mapPoint.classList.remove('active');
+                }
+            }
+        }
+    }
+
+    // 5. API 실시간 데이터 연동
     function fetchSensorData() {
         fetch('/api/sensors')
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {
                     const unitMap = { 'temp': '°C', 'hum': '%', 'dust': 'µg/m³', 'co2': 'ppm' };
+                    let hasAlert = false;
+                    let alertMsg = "";
 
                     data.forEach(item => {
                         const targetCode = item.value_code === 'pm25' ? 'dust' : item.value_code;
@@ -421,6 +634,7 @@
                         const valElem = document.getElementById(`val-${targetCode}`);
                         if (valElem && item.value !== null) {
                             valElem.innerText = item.value;
+                            updateAirStatus(targetCode, item.value);
                         }
 
                         const unit = unitMap[targetCode] || '';
@@ -428,12 +642,27 @@
                             updateDiffBadge(`diff-${targetCode}`, item.diff, unit);
                         }
 
-                        // DB 수집 데이터의 recorded_point 값 연동
+                        // DB recorded_point 값을 하단 트랙 지도에 연동
                         if (item.recorded_point) {
-                            const pointElem = document.getElementById('current-point-val');
-                            if (pointElem) pointElem.innerText = `Point ${item.recorded_point}`;
+                            updateRouteMap(item.recorded_point);
+                        }
+
+                        if (targetCode === 'co2' && item.value > 1000) {
+                            hasAlert = true;
+                            alertMsg = `현재 CO2 농도가 높습니다 (${item.value} ppm). 환기가 필요합니다.`;
+                        } else if (targetCode === 'dust' && item.value > 80) {
+                            hasAlert = true;
+                            alertMsg = `현재 미세먼지 농도가 위험 수준입니다 (${item.value} µg/m³).`;
                         }
                     });
+
+                    const alertBanner = document.getElementById('alertBanner');
+                    if (hasAlert) {
+                        alertBanner.style.display = 'flex';
+                        document.getElementById('alertText').innerText = alertMsg;
+                    } else {
+                        alertBanner.style.display = 'none';
+                    }
                 }
             })
             .catch(error => console.error("API 연동 오류:", error));
