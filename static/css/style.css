@@ -1,3 +1,12 @@
+body {
+    background: linear-gradient(rgba(248, 250, 252, 0.8), rgba(248, 250, 252, 0.88)),
+        url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
+    background-size: cover ;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    color: #1e293b;
+    margin: 0;
+}
+
 .smart-card, .chart-box {
     background-color: rgba(255, 255, 255, 0.7) !important; 
     backdrop-filter: blur(8px);           
@@ -47,12 +56,18 @@
 
 .date-picker-container {
     width: 100%;
-    max-width: 1400px;
-    margin: 20px auto 10px auto;
+    max-width: 300px;
+    margin: 20px auto 15px auto;
     padding: 0 40px;
     display: flex;
     justify-content: flex-end; 
     align-items: center;
-    gap: 12px;
-    box-sizing: border-box;                     /* 텍스트 색상을 어두운 회색으로 지정 */
+    gap: 10px;
+    box-sizing: border-box;
+}
+.date-picker-container label {
+    font-size: 24px;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap; 
 }
