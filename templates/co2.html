@@ -4,13 +4,13 @@
 {% include "header.html" %}
 {% endblock %}
 {% block content %}
-<div class="chart-co2">
+<div class="date-picker-container" style="margin-left: auto; width: calc(50% - 12px); margin-top: 15px; text-align: center; box-sizing: border-box;">
+    <label for="chartDate">날짜 선택: </label>
+    <input type="date" id="chartDate" name="chartDate">
+</div>
+<div class="chart-temp">
     <div class="chart-box"><canvas id="today"></canvas></div>
-    <div class="chart-box"><canvas id="compare"></canvas></div>
-    <div class="date-picker-container" style="margin-left: auto; width: calc(50% - 12px); margin-top: 15px; text-align: center; box-sizing: border-box;">
-        <label for="chartDate">날짜 선택: </label>
-        <input type="date" id="chartDate" name="chartDate">
-    </div>
+    <div class="chart-box"><canvas id="compare"></canvas></div>   
 </div>
 {% endblock %}
 
@@ -20,126 +20,68 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 
 <script>
-    function formatToTimeSeries(labels, values) {
-        if (!labels || !values) return [];
-        return labels.map((label, idx) => ({
+    function formatToSingleTimeSeries(chartItem) {
+        if (!chartItem || !chartItem.labels || !chartItem.values) return [];
+        
+        return chartItem.labels.map((label, idx) => ({
             x: label,
-            y: values[idx]
+            y: chartItem.values[idx],
+            point: chartItem.points ? chartItem.points[idx] : 'N/A'
         }));
     }
 
-    const chartsData = {{ charts | tojson | safe }};
+    const chartsData = {{ chart | tojson | safe }};
+    const rawData = formatToSingleTimeSeries(chartsData);
 
-    const timeDataPoints = [1, 2, 3, 4].map(pt => {
-        const item = chartsData.find(i => i.point == pt);
-        return formatToTimeSeries(item?.labels, item?.values);
-    });
-
-    const [timeDataPoint1, timeDataPoint2, timeDataPoint3, timeDataPoint4] = timeDataPoints;
-    
-    const ctx1 = document.getElementById('today');
-    const todayChart = new Chart(ctx1, {
-        type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: 'Point1',
-                    data: timeDataPoint1,
-                    borderColor: 'red',
-                    backgroundColor: 'red',
+    function createChartConfig(datas) {
+        return {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'CO2 (ppm)',
+                    data: datas,
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return `${context[0].label}`;
+                            },
+                            label: function(context) {
+                                const raw = context.raw;
+                                return ` [point ${raw.point}] CO2: ${raw.y}ppm`;
+                            }
+                        }
+                    }
                 },
-                {
-                    label: 'Point2',
-                    data: timeDataPoint2,
-                    borderColor: 'blue',
-                    backgroundColor: 'blue',
-                },
-                {
-                    label: 'Point3',
-                    data: timeDataPoint3,
-                    borderColor: 'green',
-                    backgroundColor: 'green',
-                },
-                {
-                    label: 'Point4',
-                    data: timeDataPoint4,
-                    borderColor: 'yellow',
-                    backgroundColor: 'yellow',
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        parser: 'HH:mm',
-                        unit: 'hour',
-                        displayFormats: { hour: 'HH:mm' }
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            parser: 'HH:mm',
+                            unit: 'hour',
+                            displayFormats: { hour: 'HH:mm' }
+                        },
+                        min: '00:00',
+                        max: '23:59',
                     },
-                    min: '00:00',
-                    max: '23:59'
-                },
-                y: {
-                    beginAtZero: false,
-                    min: 0,
-                    max: 2000
+                    y: {
+                        beginAtZero: false,
+                        min: 0,
+                        max: 2000
+                    }
                 }
             }
-        }
-    });
+        };
+    }
+
+    const ctx1 = document.getElementById('today');
+    const todayChart = new Chart(ctx1, createChartConfig(rawData));
 
     const ctx2 = document.getElementById('compare');
-    const compareChart = new Chart(ctx2, {
-        type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: 'Point1',
-                    data: timeDataPoint1,
-                    borderColor: 'red',
-                    backgroundColor: 'red',
-                },
-                {
-                    label: 'Point2',
-                    data: timeDataPoint2,
-                    borderColor: 'blue',
-                    backgroundColor: 'blue',
-                },
-                {
-                    label: 'Point3',
-                    data: timeDataPoint3,
-                    borderColor: 'green',
-                    backgroundColor: 'green',
-                },
-                {
-                    label: 'Point4',
-                    data: timeDataPoint4,
-                    borderColor: 'yellow',
-                    backgroundColor: 'yellow',
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        parser: 'HH:mm',
-                        unit: 'hour',
-                        displayFormats: { hour: 'HH:mm' }
-                    },
-                    min: '00:00',
-                    max: '23:59',
-                },
-                y: {
-                    beginAtZero: false,
-                    min: 0,
-                    max: 2000
-                }
-            }
-        }
-    });
+    const compareChart = new Chart(ctx2, createChartConfig(rawData));
 
     const dateInput = document.getElementById('chartDate');
 
@@ -147,24 +89,15 @@
         const selectedDate = event.target.value;
         if (!selectedDate) return;
 
-        fetch("/api/co2", {
+        fetch("/api/temp", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ date: selectedDate })
         })
         .then(response => response.json())
         .then(data => {
-            compareChart.data.datasets.forEach((dataset, index) => {
-                const pointNum = index + 1;
-                
-                const matchData = data.charts.find(item => item.point == pointNum);
-
-                if (matchData) {
-                    dataset.data = formatToTimeSeries(matchData.labels, matchData.values)
-                } else {
-                    dataset.data = [];
-                }
-            })
+            const responseChartData = data.chart ? data.chart : data;
+            compareChart.data.datasets[0].data = formatToSingleTimeSeries(responseChartData);
 
             compareChart.update();
         })
