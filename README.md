@@ -30,3 +30,6 @@
 이동형 시스템이 동작하기 위한 최소 기준이다.
 
 추후 일정이 된다면 모터 PID 루프 구조로 주행 안정성을 높이고, 초음파 기반 안전 정지 구현을 고려중이다.
+
+UART 기반 사용자 정의 프레임 프로토콜 설계
+Start Byte | Target ID | Payload | Checksum | Stop Byte
