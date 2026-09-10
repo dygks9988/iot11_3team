@@ -10,8 +10,9 @@
 
 <img width="549" height="412" alt="image" src="https://github.com/user-attachments/assets/fb23e3ad-ec43-4149-9472-9f8d68355d29" />
 
+<img width="549" height="412" alt="image" src="https://github.com/user-attachments/assets/1ff7f645-6c25-4663-b0d9-bb12617ef6de" />
 
-<img width="549" height="412" alt="image" src="https://github.com/user-attachments/assets/66cd5faa-abab-4da2-863f-c617064a5863" />
+
 
 초기 버전 SW구성도,팀원의 이해를 돕기 위해 슈퍼루프로 비선점형 태스크를 모방 하였다
 
@@ -19,4 +20,4 @@
 
 이동형 시스템이 동작하기 위한 최소 기준
 
-추후 모터 PID 루프 구조로 라인트레이싱 안정성과 초음파 센서를 추가해 장애물 감지 기반의 안전 정지 기능을 구현을 고려중
+추후 모터 PID 루프 구조로 주행 안정성과 초음파 센서를 추가해 장애물 감지 기반의 안전 정지 기능을 구현을 고려중
