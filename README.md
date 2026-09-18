@@ -33,5 +33,10 @@ MCU와 Linux 간 통신을 통해 데이터를 저장·전송하며 로봇 및 �
 
 추후 일정이 된다면 모터 PID 루프 구조로 주행 안정성을 높이고, 초음파 기반 안전 정지 구현을 고려중이다.
 
-UART 기반 사용자 정의 프레임 프로토콜 설계
-Start Byte | Target ID | Payload | Checksum | Stop Byte
+## UART 계획
+DMA Circular
+IDLE event callback
+
+## ModeBUS Protocol
+설계 필요
+
