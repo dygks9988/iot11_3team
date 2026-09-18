@@ -29,7 +29,7 @@
 #define HAL_Lib         2
 
 // Output Pin 설정시에만 활성화 할것
-#define Out_Pin_Define_Nb1  3
+//#define Out_Pin_Define_Nb1  3
 //#define TIM_En   1
 
 // Input Pin 설정시에만 활성화 할것
@@ -272,6 +272,10 @@ static inline void sts_tg(GPIO_TypeDef *GPIOx, uint8_t sts_flag, uint8_t bits)
  if(sts_flag ==1) GPIOx -> BSRR = (1U << bits);
  else GPIOx -> BSRR = (1U << (bits + 16));
 }
+
+
+// SyStem delay LIB = 2023, 05, 17 = IOT 2기
+#define Delay_ms(val)  HAL_Delay(val)
 
 #endif
 

@@ -9,7 +9,7 @@
 
 
 void actuator_init();
-void actuator_process(Motor_Instruction_MsgTypeDef instruction_msg);
+void actuator_process(Motor_Instruction_MsgTypeDef* instruction_msg);
 
 
 

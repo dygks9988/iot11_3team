@@ -497,9 +497,6 @@ uint16_t PortC_rd_WD(void)
 
 //4. System Control
 
-// SyStem delay LIB = 2023, 05, 17 = IOT 2기
-#define Delay_ms(val)  HAL_Delay(val)
-
 // Arduino Map 함수 구현 == 2024, 01, 16 추가
 long my_map(long x, long in_min, long in_max, long out_min, long out_max)
 {

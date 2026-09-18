@@ -1,15 +1,21 @@
-
-// My_Lib
-//#include "My_ARM_RTOS_ADC_Lib_V3_2.h"
+//My_Lib
+#include "My_ARM_RTOS_ADC_Lib_V3_2.h"
 
 // prj_Lib
 #include "motor_instruction.h"
 #include "actuator.h"
 
+// HAL_Lib
+#include "adc.h"
+#include "tim.h"
+
+#define IR_THRESHOLD 2000
+#define IR_NB 5
+
 
 #define KP 8
 #define KD 0 // todo
-#define DT 0.1f
+#define DT 0.01f
 
 
 
@@ -33,28 +39,33 @@ typedef enum{
 }IRSensor_Pattern_TypeDef;
 
 
+
 static int8_t prv_error;
 
-// IR 센서 센싱
-static IRSensor_State_TypeDef ir_sensing(int8_t* error){
+
+
+
+
+// 라인판단
+static IRSensor_State_TypeDef line_detect(int8_t* error, uint16_t* ir_sensor){
     
     IRSensor_State_TypeDef ir_state = 0;
-    IRSensor_Pattern_TypeDef ir_pattern = 0;
+    uint8_t ir_pattern = 0;
 
-    uint32_t adc_buf[5] = {0,0,0,0,0};
+    uint8_t line_buf[5] = {0,0,0,0,0};
+
     uint8_t high_cnt = 0;
 
     // ADC 측정 My Lib 사용
-    //adc_Mult_Polling_avg(&hadc1,adc_buf,5,5);
-
     // 라인 상태 확인
-    for(uint8_t i = 0;i < 5; i++){
-    if(adc_buf[i] > 2000)adc_buf[i] = 1;
-    else adc_buf[i] = 0;
 
-    if(adc_buf[i] == 1) high_cnt++;
+    for(uint8_t i = 0;i < 5; i++){
+    if(ir_sensor[i] > IR_THRESHOLD)line_buf[i] = 1;
+    else line_buf[i] = 0;
+
+    if(line_buf[i] == 1) high_cnt++;
     // 패턴 생성
-    ir_pattern |= (adc_buf[i] << i);
+    ir_pattern |= (line_buf[i] << i);
     }
 
     // 에러 확인
@@ -110,40 +121,60 @@ static IRSensor_State_TypeDef ir_sensing(int8_t* error){
 
 // PD 제어 방향 값 리턴
 static inline int16_t pd_correction(int8_t error){
-    int16_t corretion = KP * error + KD * (error - prv_error) / DT;
+    int16_t correction = KP * error + KD * (error - prv_error) / DT;
 
     prv_error = error;
 
-    return corretion;
+    return correction;
 }
 
+// 라인 센서 init
+void line_sensor_init(){
+	// 학원 라이브러리 사용
+	// DMA 서큘러
+	// ADC 타임트리거, 스캔 컨버전 모드 사용
+	// 타임 트리거 주기 10ms
+	Adc_Setup(&hadc1, IR_NB, 0);
+	HAL_TIM_Base_Start(&htim3);
+
+}
+
+
 // 모터 명령 생성 공개 API
-bool motor_instruction_created(Motor_Instruction_MsgTypeDef* Instruction_Msg){
+// DMA의 시퀸스가 끝나면 동작하는 프로세스
+// RTOS IPC로 태스크가 레디 되어야한다
+// My_Lib adc -> ad_buf가 인자값으로 들어와야 한다
+
+bool motor_instruction_create(Motor_Instruction_MsgTypeDef* Instruction_Msg,uint16_t* ir_sensor){
     int8_t error;
-    int16_t corretion;
+    int16_t correction;
 
     // @todo 모드별 RPM
-    int16_t right_mode_rpm = 30;
-    int16_t left_mode_rpm = 30;
+    uint16_t right_mode_rpm = 100;
+    uint16_t left_mode_rpm = 100;
 
-    IRSensor_State_TypeDef ir_state = ir_sensing(&error);
+    IRSensor_State_TypeDef ir_state = line_detect(&error,ir_sensor);
+
 
     switch (ir_state)
     {
         // @todo IR 상태별 제어 로직
+
     case IR_STATE_NONE:
         return false;
     case IR_STATE_ERROR:
-        return false;
+    	// 다음 샘플링을 기다리는 구조로 가면 좋을 것 같다 에러 카운트
+    	return false;
     case IR_STATE_NORMAL:
-        corretion = pd_correction(error);
+    	correction = pd_correction(error);
 
-        left_mode_rpm += (corretion/5);
-        right_mode_rpm -= (corretion/5);
+        left_mode_rpm += (correction/5);
+        right_mode_rpm -= (correction/5);
 
-        Instruction_Msg -> servo_angle = BASE_SERVO_ANGLE + corretion;
+        Instruction_Msg -> servo_angle = BASE_SERVO_ANGLE + correction;
         Instruction_Msg -> right_dc_rpm = right_mode_rpm;
         Instruction_Msg -> left_dc_rpm = left_mode_rpm;
+
         break;
     default:
     return false;

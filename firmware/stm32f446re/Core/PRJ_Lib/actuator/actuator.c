@@ -32,12 +32,14 @@ static Servo_Motor_HandleTypeDef* servo = &hservo1;
 
 //10Mhz 9분주 ARR 999
 //10kHz 100us주기 카운터
-//@todo 아직 모터가 오지 않았음 도착하고 튜닝예정
+//@todo 아직 모터가 오지 않았음 도착하고 튜닝예정 현재는 무부하 기준
+
 #define DC_ARR 999
-#define	MAX_RPM 280
+#define	MAX_RPM 330
 
 // 변환식
 static inline uint32_t rpm_to_ccr(uint16_t rpm) {
+	if(rpm > MAX_RPM)rpm = MAX_RPM;
     return (uint32_t)(rpm) * DC_ARR / MAX_RPM;
 }
 
@@ -52,6 +54,7 @@ static inline uint32_t rpm_to_ccr(uint16_t rpm) {
 #define MAX_ANGLE 180
 
 static inline uint32_t angle_to_ccr(uint16_t angle){
+	if(angle > MAX_ANGLE)angle = MAX_ANGLE;
 	return ((((MAX_CCR - MIN_CCR) / MAX_ANGLE) *(uint32_t)angle)  + MIN_CCR);
 }
 
@@ -90,12 +93,12 @@ void actuator_init(){
 }
 
 
-void actuator_process(Motor_Instruction_MsgTypeDef instruction_msg){
+void actuator_process(Motor_Instruction_MsgTypeDef* instruction_msg){
 	//Receive Msg
-    right_dcmotor->target_rpm = instruction_msg.right_dc_rpm;
-    left_dcmotor->target_rpm = instruction_msg.left_dc_rpm;
+    right_dcmotor->target_rpm = instruction_msg->right_dc_rpm;
+    left_dcmotor->target_rpm = instruction_msg->left_dc_rpm;
 
-    servo ->target_angle = instruction_msg.servo_angle;
+    servo ->target_angle = instruction_msg->servo_angle;
 
     // DcMotor PWM set
     set_dc_rpm(right_dcmotor);
