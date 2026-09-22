@@ -4,11 +4,12 @@
  *  Created on: Sep 18, 2026
  *      Author: pc
  */
+
 #include <c_stdlib.h>
-//FreeRTOS API
+// FreeRTOS API
 #include <os_common.h>
 
-//Prj_Lib
+// Prj_Lib
 #include "actuator.h"
 #include "msg.h"
 

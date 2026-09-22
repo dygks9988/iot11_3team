@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "os_common.h"
+#include "actuator.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -128,7 +129,8 @@ void instruction(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	instruction_task();
+	//instruction_task();
+	  vTaskDelay(100);
   }
   /* USER CODE END instruction */
 }
@@ -144,9 +146,14 @@ void actuator(void *argument)
 {
   /* USER CODE BEGIN actuator */
   /* Infinite loop */
+	Motor_Instruction_MsgTypeDef receive_msg;
+	receive_msg .left_dc_rpm = 100;
+	receive_msg .right_dc_rpm = 100;
   for(;;)
   {
-    actuator_task();
+	  actuator_process(&receive_msg);
+	  vTaskDelay(10);
+    //actuator_task();
   }
   /* USER CODE END actuator */
 }
