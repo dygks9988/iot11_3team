@@ -48,7 +48,7 @@ Slave Enviroment STM32
 DMA Circular
 IDLE event callback
 
-## ModeBUS Protocol
+## ModBUS Protocol
 설계 필요
 
 ## 디버깅
