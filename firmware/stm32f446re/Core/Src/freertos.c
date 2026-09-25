@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "tim.h"
 #include "os_common.h"
 #include "actuator.h"
 /* USER CODE END Includes */
@@ -62,6 +63,13 @@ const osThreadAttr_t Actuator_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Encoder */
+osThreadId_t EncoderHandle;
+const osThreadAttr_t Encoder_attributes = {
+  .name = "Encoder",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -70,6 +78,7 @@ const osThreadAttr_t Actuator_attributes = {
 
 void instruction(void *argument);
 void actuator(void *argument);
+void encoder(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -106,6 +115,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of Actuator */
   ActuatorHandle = osThreadNew(actuator, NULL, &Actuator_attributes);
 
+  /* creation of Encoder */
+  EncoderHandle = osThreadNew(encoder, NULL, &Encoder_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -130,7 +142,7 @@ void instruction(void *argument)
   for(;;)
   {
 	//instruction_task();
-	  vTaskDelay(100);
+	  vTaskDelay(10);
   }
   /* USER CODE END instruction */
 }
@@ -147,8 +159,8 @@ void actuator(void *argument)
   /* USER CODE BEGIN actuator */
   /* Infinite loop */
 	Motor_Instruction_MsgTypeDef receive_msg;
-	receive_msg .left_dc_rpm = 100;
-	receive_msg .right_dc_rpm = 100;
+	receive_msg .left_dc_rpm = 130;
+	receive_msg .right_dc_rpm = 130;
   for(;;)
   {
 	  actuator_process(&receive_msg);
@@ -156,6 +168,38 @@ void actuator(void *argument)
     //actuator_task();
   }
   /* USER CODE END actuator */
+}
+
+/* USER CODE BEGIN Header_encoder */
+/**
+* @brief Function implementing the Encoder thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_encoder */
+void encoder(void *argument)
+{
+  /* USER CODE BEGIN encoder */
+  /* Infinite loop */
+	extern uint8_t sec_flag;
+	encoder_init();
+
+	TickType_t xLastWakeTime;
+	xLastWakeTime = xTaskGetTickCount();
+  for(;;)
+  {
+	  update_motor_rpm(right_dcmotor_front);
+	  update_motor_rpm(right_dcmotor_rear);
+	  update_motor_rpm(left_dcmotor_front);
+	  update_motor_rpm(left_dcmotor_rear);
+
+	  if(sec_flag == 1){
+		  sec_flag = 0;
+		  dis_rpm();
+	  }
+	 vTaskDelayUntil(&xLastWakeTime,50);
+  }
+  /* USER CODE END encoder */
 }
 
 /* Private application code --------------------------------------------------*/

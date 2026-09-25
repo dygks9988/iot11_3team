@@ -57,22 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CW1_Pin GPIO_PIN_0
-#define CW1_GPIO_Port GPIOC
-#define CCW1_Pin GPIO_PIN_1
-#define CCW1_GPIO_Port GPIOC
-#define CW2_Pin GPIO_PIN_2
-#define CW2_GPIO_Port GPIOC
-#define CCW2_Pin GPIO_PIN_3
-#define CCW2_GPIO_Port GPIOC
-#define CW3_Pin GPIO_PIN_4
-#define CW3_GPIO_Port GPIOC
-#define CCW3_Pin GPIO_PIN_5
-#define CCW3_GPIO_Port GPIOC
-#define CW4_Pin GPIO_PIN_1
-#define CW4_GPIO_Port GPIOB
-#define CCW4_Pin GPIO_PIN_2
-#define CCW4_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
