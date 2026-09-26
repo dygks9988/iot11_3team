@@ -52,14 +52,14 @@ static IRSensor_State_TypeDef line_detect(int8_t* error, uint16_t* ir_sensor){
     IRSensor_State_TypeDef ir_state = 0;
     uint8_t ir_pattern = 0;
 
-    uint8_t line_buf[5] = {0,0,0,0,0};
+    uint8_t line_buf[IR_NB] = {0,0,0,0,0};
 
     uint8_t high_cnt = 0;
 
     // ADC 측정 My Lib 사용
     // 라인 상태 확인
 
-    for(uint8_t i = 0;i < 5; i++){
+    for(uint8_t i = 0;i < IR_NB; i++){
     if(ir_sensor[i] > IR_THRESHOLD)line_buf[i] = 1;
     else line_buf[i] = 0;
 
@@ -135,7 +135,7 @@ void line_sensor_init(){
 	// ADC 타임트리거, 스캔 컨버전 모드 사용
 	// 타임 트리거 주기 10ms
 	Adc_Setup(&hadc1, IR_NB, 0);
-	HAL_TIM_Base_Start(&htim3);
+	HAL_TIM_Base_Start(&htim8);
 
 }
 
@@ -168,10 +168,9 @@ bool motor_instruction_create(Motor_Instruction_MsgTypeDef* Instruction_Msg,uint
     case IR_STATE_NORMAL:
     	correction = pd_correction(error);
 
-        left_mode_rpm += (correction/5);
-        right_mode_rpm -= (correction/5);
+        left_mode_rpm += (correction/3);
+        right_mode_rpm -= (correction/3);
 
-        Instruction_Msg -> servo_angle = BASE_SERVO_ANGLE + correction;
         Instruction_Msg -> right_dc_rpm = right_mode_rpm;
         Instruction_Msg -> left_dc_rpm = left_mode_rpm;
 

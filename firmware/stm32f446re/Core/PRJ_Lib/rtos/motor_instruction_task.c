@@ -25,7 +25,7 @@ void instruction_task(){
 		 {
 #if debug
 			for(int i = 0; i<5;i++){
-			printf("ad_buf%d = %u\r\n",i,adc->ad_buf[i]);
+			printf("ad_buf%d = %u\r\n",i+1,adc->ad_buf[i]);
 			}
 #endif
 		    motor_instruction_create(&instruction_msg,adc->ad_buf);

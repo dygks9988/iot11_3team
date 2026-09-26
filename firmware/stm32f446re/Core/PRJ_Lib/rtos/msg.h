@@ -10,7 +10,6 @@
 // 액추에이터 태스크로 보낼 메세지
 // motor_instruction 태스크 소유
 typedef struct{
-    uint16_t servo_angle;
     uint16_t right_dc_rpm;
     uint16_t left_dc_rpm;
 }Motor_Instruction_MsgTypeDef;

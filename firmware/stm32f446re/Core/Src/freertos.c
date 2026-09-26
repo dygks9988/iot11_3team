@@ -141,8 +141,7 @@ void instruction(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	//instruction_task();
-	  vTaskDelay(10);
+	instruction_task();
   }
   /* USER CODE END instruction */
 }
@@ -158,14 +157,10 @@ void actuator(void *argument)
 {
   /* USER CODE BEGIN actuator */
   /* Infinite loop */
-	Motor_Instruction_MsgTypeDef receive_msg;
-	receive_msg .left_dc_rpm = 130;
-	receive_msg .right_dc_rpm = 130;
+
   for(;;)
   {
-	  actuator_process(&receive_msg);
-	  vTaskDelay(10);
-    //actuator_task();
+    actuator_task();
   }
   /* USER CODE END actuator */
 }
@@ -195,7 +190,7 @@ void encoder(void *argument)
 
 	  if(sec_flag == 1){
 		  sec_flag = 0;
-		  dis_rpm();
+//		  dis_rpm();
 	  }
 	 vTaskDelayUntil(&xLastWakeTime,50);
   }
