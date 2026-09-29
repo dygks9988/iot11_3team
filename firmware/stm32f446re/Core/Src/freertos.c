@@ -70,6 +70,13 @@ const osThreadAttr_t Encoder_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Mode */
+osThreadId_t ModeHandle;
+const osThreadAttr_t Mode_attributes = {
+  .name = "Mode",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -79,6 +86,7 @@ const osThreadAttr_t Encoder_attributes = {
 void instruction(void *argument);
 void actuator(void *argument);
 void encoder(void *argument);
+void mode(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -117,6 +125,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of Encoder */
   EncoderHandle = osThreadNew(encoder, NULL, &Encoder_attributes);
+
+  /* creation of Mode */
+  ModeHandle = osThreadNew(mode, NULL, &Mode_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -190,11 +201,29 @@ void encoder(void *argument)
 
 	  if(sec_flag == 1){
 		  sec_flag = 0;
-//		  dis_rpm();
+		  dis_rpm();
 	  }
 	 vTaskDelayUntil(&xLastWakeTime,50);
   }
   /* USER CODE END encoder */
+}
+
+/* USER CODE BEGIN Header_mode */
+/**
+* @brief Function implementing the Mode thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_mode */
+void mode(void *argument)
+{
+  /* USER CODE BEGIN mode */
+  /* Infinite loop */
+  for(;;)
+  {
+    mode_task();
+  }
+  /* USER CODE END mode */
 }
 
 /* Private application code --------------------------------------------------*/

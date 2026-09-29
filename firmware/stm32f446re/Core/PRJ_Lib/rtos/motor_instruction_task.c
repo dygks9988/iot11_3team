@@ -16,11 +16,12 @@
 #include "motor_instruction.h"
 #include "msg.h"
 
-#define debug 1
+//#define debug 1
 
 void instruction_task(){
-	Motor_Instruction_MsgTypeDef instruction_msg = {0,0,0};
+	Motor_Instruction_MsgTypeDef instruction_msg = {0,0};
 	for(;;){
+		// From ADC Callback
 		if (xSemaphoreTake(adcSemaphoreHandle, portMAX_DELAY) == pdTRUE)
 		 {
 #if debug

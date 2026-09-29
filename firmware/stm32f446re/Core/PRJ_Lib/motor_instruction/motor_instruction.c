@@ -13,7 +13,7 @@
 #define IR_NB 5
 
 
-#define KP 8
+#define KP 15
 #define KD 0 // todo
 #define DT 0.01f
 
@@ -27,6 +27,7 @@ typedef enum{
 }IRSensor_State_TypeDef;
 
 typedef enum{
+	IR_RIGHT0 = 0b00111,
     IR_RIGHT1 = 0b00001,
     IR_RIGHT2 = 0b00011,
     IR_RIGHT3 = 0b00010,
@@ -35,7 +36,8 @@ typedef enum{
     IR_LEFT1 = 0b01100,
     IR_LEFT2 = 0b01000,
     IR_LEFT3 = 0b11000,
-    IR_LEFT4 = 0b10000
+    IR_LEFT4 = 0b10000,
+	IR_LEFT5 = 0b11100
 }IRSensor_Pattern_TypeDef;
 
 
@@ -83,6 +85,9 @@ static IRSensor_State_TypeDef line_detect(int8_t* error, uint16_t* ir_sensor){
         
         case IR_STATE_NORMAL:
         switch (ir_pattern){
+        	case IR_RIGHT0:
+                *error = 5;
+                 break;
             case IR_RIGHT1:
                 *error = 4;
                 break;
@@ -110,6 +115,9 @@ static IRSensor_State_TypeDef line_detect(int8_t* error, uint16_t* ir_sensor){
             case IR_LEFT4:
                 *error = -4;
                 break;
+            case IR_LEFT5:
+                 *error = -5;
+                 break;
             default:
                 // 정의된 라인이 아니라면 IR_STATE_ERROR
                 return IR_STATE_ERROR;
@@ -135,8 +143,6 @@ void line_sensor_init(){
 	// ADC 타임트리거, 스캔 컨버전 모드 사용
 	// 타임 트리거 주기 10ms
 	Adc_Setup(&hadc1, IR_NB, 0);
-	HAL_TIM_Base_Start(&htim8);
-
 }
 
 
@@ -150,8 +156,8 @@ bool motor_instruction_create(Motor_Instruction_MsgTypeDef* Instruction_Msg,uint
     int16_t correction;
 
     // @todo 모드별 RPM
-    uint16_t right_mode_rpm = 100;
-    uint16_t left_mode_rpm = 100;
+    int16_t right_mode_rpm = 70;
+    int16_t left_mode_rpm = 70;
 
     IRSensor_State_TypeDef ir_state = line_detect(&error,ir_sensor);
 
@@ -168,8 +174,14 @@ bool motor_instruction_create(Motor_Instruction_MsgTypeDef* Instruction_Msg,uint
     case IR_STATE_NORMAL:
     	correction = pd_correction(error);
 
-        left_mode_rpm += (correction/3);
-        right_mode_rpm -= (correction/3);
+        left_mode_rpm += (correction);
+        right_mode_rpm -= (correction);
+
+        if (left_mode_rpm < 0)
+            left_mode_rpm = 0;
+
+        if (right_mode_rpm < 0)
+            right_mode_rpm = 0;
 
         Instruction_Msg -> right_dc_rpm = right_mode_rpm;
         Instruction_Msg -> left_dc_rpm = left_mode_rpm;

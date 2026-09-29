@@ -31,6 +31,7 @@ typedef struct{
     float encoder_cpr;
 
     float ccr_gain;
+    uint16_t min_ccr;
 }Dc_Motor_HandleTypeDef;
 
 extern Dc_Motor_HandleTypeDef* right_dcmotor_front;

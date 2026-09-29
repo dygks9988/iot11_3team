@@ -36,6 +36,7 @@
 #include <msg.h>
 #include <motor_instruction.h>
 #include <actuator.h>
+#include <robot_mode.h>
 
 /* USER CODE END Includes */
 
@@ -220,10 +221,32 @@ static void MX_NVIC_Init(void)
   /* DMA2_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+  /* EXTI15_10_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    static uint32_t last_tick = 0;
 
+    if (GPIO_Pin == GPIO_PIN_13)
+    {
+        uint32_t now = HAL_GetTick();
+        // 디바운싱
+        if ((now - last_tick) < 200)return;
+        last_tick = now;
+
+        // 토글 명령
+        Robot_CmdTypeDef robot_cmd = ROBOT_CMD_TOGGLE;
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+        xQueueSendFromISR(modeQueueHande,&robot_cmd,&xHigherPriorityTaskWoken);
+
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+}
 /* USER CODE END 4 */
 
 /**
@@ -250,6 +273,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   /* USER CODE END Callback 1 */
 }
+
+
 
 /**
   * @brief  This function is executed in case of error occurrence.

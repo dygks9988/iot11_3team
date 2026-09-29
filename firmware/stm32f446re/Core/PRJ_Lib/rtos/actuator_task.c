@@ -14,10 +14,12 @@
 #include "msg.h"
 
 void actuator_task(){
-	Motor_Instruction_MsgTypeDef receive_msg = {0,0,0};
+	Motor_Instruction_MsgTypeDef receive_msg = {0,0};
 	for(;;){
-		if (xQueueReceive(insQueueHandle,&receive_msg, portMAX_DELAY) == pdTRUE){
+	if (xQueueReceive(insQueueHandle,&receive_msg, portMAX_DELAY) == pdTRUE){
 			actuator_process(&receive_msg);
 		}
+//		actuator_process(&receive_msg);
 	}
 }
+
