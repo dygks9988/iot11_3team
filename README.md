@@ -59,6 +59,8 @@ Slave Enviroment STM32
 
 - 로봇 차체 구동부 배선 완료
 
+- Modbus protocol (Read coil,reg) (Write coil)등 제한된 기능 구현 
+
 
 
 ## 주요 데이터 흐름
@@ -189,4 +191,7 @@ L298N H-Bridge 회로의 EN핀이 GPIO 3.3V로 HIGH 로직을 받지 못하는 �
 
 
 5채널 IR센서중 가장 왼쪽 센서의 기능이 현저하게 떨어져 라인트레이싱에 치명적인 문제를 야기하고 있다.
+
+Modbus protocol slave 응답의 에러율이 20%에 근사 된다. UARTEventCallback의 idle flag 문제로 추측하고 있으며 라즈베리파이와 연동 되는 것을 확인 한 뒤 디버깅 할 예정이다.
+
 
