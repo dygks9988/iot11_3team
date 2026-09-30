@@ -35,6 +35,8 @@ Slave Actuator STM32
 
 Slave Enviroment STM32
 
+## 시스템 아키텍처
+<img width="700" height="550" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
 
 
 
