@@ -997,6 +997,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
        #endif
        if(event == HAL_UART_RXEVENT_IDLE)
         {
+    	   // 프로젝트용 queue 로직
     	   ModbusRxMsgTypeDef msg = {0};
 
     	   msg.len = rx_cnt->rx_cnt_6;

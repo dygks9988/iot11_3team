@@ -6,10 +6,12 @@
  */
 
 #include "modbus_protocol.h"
+#include "robot_mode.h"
 
 #include "My_ARM_RTOS_UART_Lib_V5_2.h"
 
 #include "os_common.h"
+
 
 
 #define MODBUS_RX_BUF_SIZE 20
@@ -42,6 +44,7 @@ void modbus_protocol_task(){
 			uint8_t data_len = 0;
 
 			uint16_t rpm = 0;
+		;
 
 			switch(modb_parser.cmd){
 				case Read_Coils:
@@ -92,9 +95,15 @@ void modbus_protocol_task(){
 					break;
 				case Write_Single_Coil:
 					if(modb_parser.flags & MODBUS_COIL_FLAG_ROBOT_STATE){
-						xQueueSend(modeQueueHandle,&modb_parser.robot_state_value,10);
+						Robot_CmdTypeDef cmd;
+						if(modb_parser.robot_state_value == 0){
+						    cmd = ROBOT_CMD_STOP;
+						}
+						else{
+							cmd = ROBOT_CMD_START;
+						}
+						xQueueSend(modeQueueHandle,&cmd,10);
 					}
-					break;
 				default:
 					break;
 			}

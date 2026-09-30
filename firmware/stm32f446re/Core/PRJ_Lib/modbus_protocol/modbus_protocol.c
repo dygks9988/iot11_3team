@@ -105,9 +105,11 @@ bool modbus_parsing(uint8_t *rx_buf,uint8_t rx_len,Modbus_ParserTypeDef* modbus_
 
 		case Write_Single_Coil:
 			modbus_parser->flags |= (1 << rtu_frame.start_address);
+			// Modbus RTU Write Single Coil ON value = 0xFF00
 			if(rtu_frame.values == 0xFF00){
 			    modbus_parser->robot_state_value = 1;
 			}
+			// Modbus RTU Write Single Coil OFF value = 0x0000
 			else if(rtu_frame.values == 0x0000){
 			    modbus_parser->robot_state_value = 0;
 			}
