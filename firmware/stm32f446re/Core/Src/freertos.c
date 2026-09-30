@@ -77,6 +77,13 @@ const osThreadAttr_t Mode_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Modebus_parser */
+osThreadId_t Modebus_parserHandle;
+const osThreadAttr_t Modebus_parser_attributes = {
+  .name = "Modebus_parser",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -87,6 +94,7 @@ void instruction(void *argument);
 void actuator(void *argument);
 void encoder(void *argument);
 void mode(void *argument);
+void modebus_parser(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -128,6 +136,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of Mode */
   ModeHandle = osThreadNew(mode, NULL, &Mode_attributes);
+
+  /* creation of Modebus_parser */
+  Modebus_parserHandle = osThreadNew(modebus_parser, NULL, &Modebus_parser_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -224,6 +235,24 @@ void mode(void *argument)
     mode_task();
   }
   /* USER CODE END mode */
+}
+
+/* USER CODE BEGIN Header_modebus_parser */
+/**
+* @brief Function implementing the Modebus_parser thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_modebus_parser */
+void modebus_parser(void *argument)
+{
+  /* USER CODE BEGIN modebus_parser */
+  /* Infinite loop */
+  for(;;)
+  {
+	 modbus_protocol_task();
+  }
+  /* USER CODE END modebus_parser */
 }
 
 /* Private application code --------------------------------------------------*/

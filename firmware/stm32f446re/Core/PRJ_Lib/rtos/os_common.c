@@ -5,12 +5,13 @@
 
 #include "msg.h"
 #include "robot_mode.h"
-
+#include "My_ARM_RTOS_UART_Lib_V5_2.h"
+#include "modbus_protocol.h"
 
 SemaphoreHandle_t adcSemaphoreHandle;
 QueueHandle_t insQueueHandle;
-QueueHandle_t modeQueueHande;
-
+QueueHandle_t modeQueueHandle;
+QueueHandle_t modbQueueHandle;
 
 
 void rtos_init(void)
@@ -23,9 +24,12 @@ void rtos_init(void)
 	if(insQueueHandle == NULL){
 		Error_Handler();
 	}
-	modeQueueHande = xQueueCreate(10,sizeof(Robot_CmdTypeDef));
-	if(modeQueueHande == NULL){
+	modeQueueHandle = xQueueCreate(10,sizeof(Robot_CmdTypeDef));
+	if(modeQueueHandle == NULL){
 		Error_Handler();
 	}
-
+	modbQueueHandle = xQueueCreate(10,sizeof(ModbusRxMsgTypeDef));
+	if(modbQueueHandle == NULL){
+		Error_Handler();
+	}
 }

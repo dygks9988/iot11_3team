@@ -39,9 +39,12 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 
+#include "os_common.h"
 // My Lib
 #include <My_ARM_RTOS_UART_Lib_V5_2.h>
 
+// Prj Lib
+#include "modbus_protocol.h"
 
 // 구조체 변수 초기화
 // rx flag
@@ -239,6 +242,13 @@ void Uart_Init(UART_HandleTypeDef *huart)
     huart2.hdmarx->Instance->CR &= ~DMA_SxCR_HTIE; // 최초 호출 시에도 HT 인터럽트 차단!
   #endif
  }
+    if(huart->Instance == USART6){
+#if IDLE_DMA_Circular_Mode_ch6
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart6, &rx_d -> Rx_data_6, DMA_Rx_Lens);
+    huart6.hdmarx->Instance->CR &= ~DMA_SxCR_HTIE; // 최초 호출 시에도 HT 인터럽트 차단!
+    }
+#endif
+
 }
 
 
@@ -624,7 +634,7 @@ if(huart->Instance == USART2)
 	   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	   //xHigherPriorityTaskWoken = 전환 필요 여부 표시
-	   xQueueSendFromISR(my_uart_irq, &rx_d -> Rx_data_6, &xHigherPriorityTaskWoken);
+	   xQueueSendFromISR(modbQueueHandle, &rx_d -> Rx_data_6, &xHigherPriorityTaskWoken);
 
 	   // 필요 시 컨텍스트 스위칭 = ISR이 끝난 뒤 바로 Task로 전환 가능
 	   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -928,17 +938,18 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 #if USART_Ch_6_EN
   if(huart->Instance == USART6)
    {
-    #if RTOS_Queue_Mode
+
+    #if RTOS_Queue_Mode_IDLE
 	  // ISR에서 Queue로 데이터 전송
 	  // 자료형 선언 = FreeRTOS 기본 정수 타입 (int 비슷, 4Byte)
 	  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	  //xHigherPriorityTaskWoken = 전환 필요 여부 표시
-	  xQueueSendFromISR(my_uart_irq, &rx_d -> Rx_data_6, &xHigherPriorityTaskWoken);
+	  xQueueSendFromISR(modbQueueHandle, &rx_d -> Rx_data_6, &xHigherPriorityTaskWoken);
 
+	  rx_cnt->rx_cnt_6 =  (uint8_t)Size;
 	  // 필요 시 컨텍스트 스위칭 = ISR이 끝난 뒤 바로 Task로 전환 가능
 	  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-	  rx_flag -> rx_end_flag_6 = 1;
 
     #elif RTOS_Sema_Mode // 세마포어바이러니 모드
       __NOP();
@@ -949,15 +960,60 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 
 	  // ReLoad
       HAL_UARTEx_ReceiveToIdle_IT(&huart6, (uint8_t *)&rx_d -> Rx_data_6, 20); // 50 Byte rx
-   #elif IDLE_DMA_Circular_Mode_ch6
-      // DMA가 반전송 또는 완료 후 자동으로 재시작되지 않게 설정
-      __HAL_DMA_DISABLE_IT(huart6.hdmarx, DMA_IT_HT);
       rx_flag -> rx_end_flag_6 = 1;
    #elif IDLE_DMA_Normal_Mode_ch6
       HAL_UARTEx_ReceiveToIdle_DMA(&huart6, (uint8_t *)&rx_d -> Rx_data_6, 20);//rx_d -> Rx_buff_size); // 50 Byte rx
       // DMA가 반전송 또는 완료 후 자동으로 재시작되지 않게 설정
       __HAL_DMA_DISABLE_IT(huart6.hdmarx, DMA_IT_HT);
       rx_flag -> rx_end_flag_6 = 1;
+	#elif IDLE_DMA_Circular_Mode_ch6
+      // DMA가 반전송 또는 완료 후 자동으로 재시작되지 않게 설정
+      uint32_t event = HAL_UARTEx_GetRxEventType(huart);
+      uint16_t dma_pos = Size;
+      uint16_t old_pos = dma_old_pos;
+      uint16_t length = 0;
+
+      // 1. 순환 버퍼(Circular) 구조에서 정확한 데이터 길이 계산
+      if(dma_pos >= old_pos) length = dma_pos - old_pos;
+      else length = DMA_Rx_Lens - old_pos + dma_pos;
+
+      // 2. 새로 들어온 길이만큼 복사 (인덱스 유지하면서 Rx_Buff에 누적)
+       for(uint16_t i = 0; i < length; i++)
+        {
+          rx_d->Rx_Buff[rx_cnt->rx_cnt_6] = rx_d->Rx_data_6[(old_pos + i) % DMA_Rx_Lens];
+          rx_cnt->rx_cnt_6++;
+
+          if(rx_cnt->rx_cnt_6 >= DMA_Rx_Lens)
+           {
+            rx_cnt->rx_cnt_6 = 0; // 버퍼 오버플로우 방지 (처음으로 롤백)
+           }
+        }
+
+       // 현재 위치를 다음 번 처리를 위해 저장
+       dma_old_pos = dma_pos;
+
+       #if debugging
+         printf("SIZE=%u OLD=%u LEN=%u EVENT=%lu\r\n", Size, old_pos, length, event);
+       #endif
+       if(event == HAL_UART_RXEVENT_IDLE)
+        {
+    	   ModbusRxMsgTypeDef msg = {0};
+
+    	   msg.len = rx_cnt->rx_cnt_6;
+
+    	   for(uint8_t i = 0; i < msg.len; i++){
+    	       msg.data[i] = rx_d->Rx_Buff[i];
+    	   }
+
+    	   // 다음 파싱을 위해 초기화
+    	   rx_cnt->rx_cnt_6 = 0;
+    	   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    	   	//xHigherPriorityTaskWoken = 전환 필요 여부 표시
+    	   xQueueSendFromISR(modbQueueHandle,&msg,&xHigherPriorityTaskWoken);
+    	   	  // 필요 시 컨텍스트 스위칭 = ISR이 끝난 뒤 바로 Task로 전환 가능
+    	   	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+        }
     #endif
   }
 #endif

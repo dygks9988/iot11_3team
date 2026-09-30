@@ -184,7 +184,21 @@ void actuator_process(Motor_Instruction_MsgTypeDef* instruction_msg){
     set_dc_rpm(left_dcmotor_rear);
 }
 
+// modbus 프로토콜 태스크에서 사용하기 위해 작성, 파일간 의존도를 고려하여 Register addr case 부분을 하드코딩으로 작성
+uint16_t motor_rpm_read(uint8_t motor_addr){
+	switch(motor_addr){
+	case 0x00:
+		return right_dcmotor_front->current_rpm;
+	case 0x01:
+		return left_dcmotor_front->current_rpm;
+	case 0x02:
+		return right_dcmotor_rear->current_rpm;
+	case 0x03:
+		return left_dcmotor_rear->current_rpm;
+	default:
+	    return 0;
 
-
+	}
+}
 
 

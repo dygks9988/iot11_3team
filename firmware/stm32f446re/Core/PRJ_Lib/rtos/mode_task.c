@@ -10,7 +10,7 @@
 #include "robot_mode.h"
 #include "msg.h"
 
-static Robot_ModeTypeDef robot_mode = ROBOT_IDLE;;
+static Robot_ModeTypeDef robot_mode = ROBOT_IDLE;
 
 void mode_task(){
 
@@ -18,7 +18,7 @@ void mode_task(){
 	// 모터 정지용 큐
 	Motor_Instruction_MsgTypeDef stop_msg = {0,0};
 	for(;;){
-		if(xQueueReceive(modeQueueHande,&robot_cmd, portMAX_DELAY) == pdTRUE){
+		if(xQueueReceive(modeQueueHandle,&robot_cmd, portMAX_DELAY) == pdTRUE){
 			mode_change(&robot_mode,robot_cmd);
 			// 모드 변경후 로봇 상태가 대기상태라면 모터정지
 			if(robot_mode == ROBOT_IDLE)
@@ -27,3 +27,6 @@ void mode_task(){
 	}
 }
 
+uint8_t robot_state_read(){
+	return robot_mode;
+}

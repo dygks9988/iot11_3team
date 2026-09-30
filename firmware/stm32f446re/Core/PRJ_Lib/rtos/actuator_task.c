@@ -19,7 +19,6 @@ void actuator_task(){
 	if (xQueueReceive(insQueueHandle,&receive_msg, portMAX_DELAY) == pdTRUE){
 			actuator_process(&receive_msg);
 		}
-//		actuator_process(&receive_msg);
 	}
 }
 

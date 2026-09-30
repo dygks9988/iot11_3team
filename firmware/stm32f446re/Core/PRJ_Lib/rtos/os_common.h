@@ -18,7 +18,8 @@ extern SemaphoreHandle_t adcSemaphoreHandle;
 
 // 큐
 extern QueueHandle_t insQueueHandle;
-extern QueueHandle_t modeQueueHande;
+extern QueueHandle_t modeQueueHandle;
+extern QueueHandle_t modbQueueHandle;
 
 // 이벤트 그룹
 // 모터 드라이빙 비트
@@ -28,8 +29,11 @@ void rtos_init();
 void actuator_task();
 void instruction_task();
 void mode_task();
-// 현재 모드 상태를 리턴
+void modbus_protocol_task();
 
+// Read Function
+uint8_t robot_state_read();
+uint16_t motor_rpm_read(uint8_t motor_addr);
 
 
 #endif /* PRJ_LIB_RTOS_OS_COMMON_H_ */

@@ -53,18 +53,20 @@
 
 //#define debugging   1
 
-#define DMA_Rx_Lens  10
+#define DMA_Rx_Lens  30
 
 
 // App Define
 #define My_Uart_LIB_EN  1
 #define Console_Ch2		2
-#define USART_Ch_2_EN	3
+//#define USART_Ch_2_EN	3
 //#define USART_Ch_3_EN	4
 //#define USART_Ch_1_EN	4
-//#define UART_Ch_4_EN	5
+#define USART_Ch_6_EN	5
 #define IDEL_Mode       6
-
+//#define RTOS_Queue_Mode 7
+//#define RTOS_Queue_Mode_IDLE 8
+#define IDLE_DMA_Circular_Mode_ch6 7
 
 #if IDEL_Mode
 // IDLE CH1
@@ -75,7 +77,7 @@
 // IDLE CH2
 //#define IDLE_IRQ_Mode_Ch2   9 // Interrupt Mode
 //#define IDLE_DMA_Normal_Mode_ch2  10 // DMA Normal_Mode
-#define IDLE_DMA_Circular_Mode_ch2  11 // DMA Circular Mode
+//#define IDLE_DMA_Circular_Mode_ch2  11 // DMA Circular Mode
 
 // IDLE CH3
 //#define IDLE_IRQ_Mode_Ch3   9 // Interrupt Mode
@@ -95,7 +97,8 @@
 // IDLE CH6
 //#define IDLE_IRQ_Mode_Ch6   9 // Interrupt Mode
 //#define IDLE_DMA_Normal_Mode_ch6  10 // DMA Normal_Mode
-//#define IDLE_DMA_Circular_Mode_ch6  11 // DMA Circular Mode
+#define IDLE_DMA_Circular_Mode_ch6  11 // DMA Circular Mode
+
 
 
 #else

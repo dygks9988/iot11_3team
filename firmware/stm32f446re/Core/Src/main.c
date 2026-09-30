@@ -114,6 +114,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM6_Init();
   MX_TIM8_Init();
+  MX_USART6_UART_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -121,6 +122,7 @@ int main(void)
   line_sensor_init();
   actuator_init();
   rtos_init();
+  Uart_Init(&huart6);
 
   //ENCODER
 //  HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL);
@@ -231,7 +233,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     static uint32_t last_tick = 0;
 
-    if (GPIO_Pin == GPIO_PIN_13)
+    if (GPIO_Pin == B1_MODEBT_Pin)
     {
         uint32_t now = HAL_GetTick();
         // 디바운싱
@@ -240,10 +242,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
         // 토글 명령
         Robot_CmdTypeDef robot_cmd = ROBOT_CMD_TOGGLE;
+
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-        xQueueSendFromISR(modeQueueHande,&robot_cmd,&xHigherPriorityTaskWoken);
-
+        xQueueSendFromISR(modeQueueHandle,&robot_cmd,&xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 }
@@ -273,8 +274,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   /* USER CODE END Callback 1 */
 }
-
-
 
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -7,6 +7,7 @@
 #include "tim.h"
 
 
+
 // 현재 프로젝트 일정과 협업관리상 하드웨어 종속을 분리하기 어려움
 // 서로 다른 모터를 각각 제어하기 위해 모터 핸들러에 MAX RPM 멤버를 추가
 
@@ -45,5 +46,7 @@ void actuator_process(Motor_Instruction_MsgTypeDef* instruction_msg);
 void encoder_init();
 void update_motor_rpm(Dc_Motor_HandleTypeDef *dc);
 void dis_rpm();
+
+
 
 #endif
