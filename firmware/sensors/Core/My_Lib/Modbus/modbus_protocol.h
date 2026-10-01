@@ -61,6 +61,11 @@ typedef enum{
 	REG_Zone_Addr = 0x04
 }SensorRegister_MapTypeDef;
 
+typedef struct{
+    uint8_t len;
+    uint8_t data[20];
+}ModbusRxMsgTypeDef;
+
 
 #define REG_FLAG_TEMP	(1 << REG_Temp_Addr)	// (1 << 0)
 #define REG_FLAG_HUMID	(1 << REG_Humid_Addr)	// (1 << 1)

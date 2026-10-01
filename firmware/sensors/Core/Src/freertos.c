@@ -28,6 +28,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "adc.h"
+#include "queue.h"
 
 #include <stdio.h>
 #include <My_MCU_Printf_Lib_V2_8.h>
@@ -41,6 +42,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+extern uint8_t uart_buf[DMA_Rx_Lens];
 
 /* USER CODE END PD */
 
@@ -57,7 +60,7 @@ extern sensorData s_data;
 osThreadId_t RS485TaskHandle;
 const osThreadAttr_t RS485Task_attributes = {
   .name = "RS485Task",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for DHT11Task */
@@ -80,6 +83,11 @@ const osThreadAttr_t MagnetTask_attributes = {
   .name = "MagnetTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
+};
+/* Definitions for modbusQueue */
+osMessageQueueId_t modbusQueueHandle;
+const osMessageQueueAttr_t modbusQueue_attributes = {
+  .name = "modbusQueue"
 };
 /* Definitions for SensorMutex */
 osMutexId_t SensorMutexHandle;
@@ -133,6 +141,10 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of modbusQueue */
+  modbusQueueHandle = osMessageQueueNew (4, sizeof(uint16_t), &modbusQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -170,25 +182,24 @@ void MX_FREERTOS_Init(void) {
 void StartRS485Task(void *argument)
 {
   /* USER CODE BEGIN StartRS485Task */
-  uint8_t rs485_rx_buf[8];
 
-
+  ModbusRxMsgTypeDef rx_msg;
   Modbus_ParserTypedef modbus_parser;
   ModbusResponse_FrameTypeDef modbus_packer;
   ModbusRTU_FrameTypeDef rtu_frame;
 
-  HAL_UART_Receive_DMA(&huart1, rs485_rx_buf, sizeof(rs485_rx_buf));
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart1, uart_buf, sizeof(uart_buf));
 
   /* Infinite loop */
   for(;;)
   {
-	if(osSemaphoreAcquire(rs485SemHandle, osWaitForever) == osOK)
+	if(xQueueReceive((QueueHandle_t)modbusQueueHandle, &rx_msg, portMAX_DELAY))
 	{
 		memset(&modbus_parser, 0, sizeof(modbus_parser));
 		memset(&modbus_packer, 0, sizeof(modbus_packer));
 		memset(&rtu_frame, 0, sizeof(rtu_frame));
 
-		if (modbus_parsing(rs485_rx_buf, &modbus_parser, &rtu_frame))
+		if (modbus_parsing(rx_msg.data, &modbus_parser, &rtu_frame))
 		{
 			HAL_UART_Transmit(&huart2, "Parsing\r\n", 9, 100);
 			uint8_t index = 0;
@@ -240,9 +251,8 @@ void StartRS485Task(void *argument)
 			}
 		}
 		else ;
-		HAL_UART_Receive_DMA(&huart1, rs485_rx_buf, sizeof(rs485_rx_buf));
 	}
-    osDelay(1);
+	// HAL_UARTEx_ReceiveToIdle_DMA(&huart1, uart_buf, sizeof(uart_buf));
   }
   /* USER CODE END StartRS485Task */
 }
@@ -382,6 +392,9 @@ void StartFastSensorTask(void *argument)
 		s_data.co2 = co2_ppm;
 		osMutexRelease(SensorMutexHandle);
 	}
+
+	if(s_data.co2 > 1500) HAL_GPIO_WritePin(Fire_Check_GPIO_Port, Fire_Check_Pin, 1);
+	else HAL_GPIO_WritePin(Fire_Check_GPIO_Port, Fire_Check_Pin, 0);
 
 //	char co2_buf[64];
 //	sprintf(co2_buf, "co2 : %u ppm\r\n",s_data.co2);

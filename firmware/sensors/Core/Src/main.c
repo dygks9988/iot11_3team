@@ -27,12 +27,16 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "queue.h"
 #include <stdio.h>
+#include "modbus_protocol.h"
 //#include <My_MCU_Printf_Lib_V2_8.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
+
 
 /* USER CODE END PTD */
 
@@ -53,6 +57,10 @@
 extern osThreadId_t FastSensorTaskHandle;
 extern osThreadId_t MagnetTaskHandle;
 extern osSemaphoreId_t rs485SemHandle;
+extern osMessageQueueId_t modbusQueueHandle;
+
+uint8_t uart_buf[DMA_Rx_Lens];
+uint16_t dma_old_pos = 0;
 
 sensorData s_data = {
 		.zone = 1
@@ -355,16 +363,74 @@ static void MX_NVIC_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if (huart->Instance == USART1)
-	{
-		osSemaphoreRelease(rs485SemHandle);
-		HAL_UART_Transmit(&huart2, "Call BACK\r\n", 11, 100);
-	}
+//	if (huart->Instance == USART1)
+//	{
+//		osSemaphoreRelease(rs485SemHandle);
+//		HAL_UART_Transmit(&huart2, "Call BACK\r\n", 11, 100);
+//	}
 
     if (huart->Instance == USART3)
     {
         osThreadFlagsSet(FastSensorTaskHandle, 0x02);
     }
+}
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+	// DMA가 반전송 또는 완료 후 자동으로 재시작되지 않게 설정
+	      uint32_t event = HAL_UARTEx_GetRxEventType(huart);
+	      uint16_t dma_pos = Size;
+	      uint16_t old_pos = dma_old_pos;
+	      uint16_t length = 0;
+
+	      static uint8_t Rx_Buff[DMA_Rx_Lens] = {0};	// rx_d->Rx_Buff
+	      static uint8_t Rx_Buff_Index = 0;	// rx_cnt->rx_cnt_2
+	      // uint8_t Rx_data[20] = {0};	// rx_d->Rx_data_2
+
+	      // 1. 순환 버퍼(Circular) 구조에서 정확한 데이터 길이 계산
+	      if(dma_pos >= old_pos) length = dma_pos - old_pos;
+	      else length = DMA_Rx_Lens - old_pos + dma_pos;
+
+	      // 2. 새로 들어온 길이만큼 복사 (인덱스 유지하면서 Rx_Buff에 누적)
+	       for(uint16_t i = 0; i < length; i++)
+	        {
+	    	  Rx_Buff[Rx_Buff_Index] = uart_buf[(old_pos + i) % DMA_Rx_Lens];
+	    	  Rx_Buff_Index++;
+
+	          if(Rx_Buff_Index >= DMA_Rx_Lens)
+	           {
+	        	 Rx_Buff_Index = 0; // 버퍼 오버플로우 방지 (처음으로 롤백)
+	           }
+	        }
+
+	       // 현재 위치를 다음 번 처리를 위해 저장
+	       dma_old_pos = dma_pos;
+
+	       #if debugging
+	         printf("SIZE=%u OLD=%u LEN=%u EVENT=%lu\r\n", Size, old_pos, length, event);
+	       #endif
+
+	       // 3. 오직 IDLE(EVENT=2) 이벤트가 발생했을 때만 data 복사.
+	       if(event == HAL_UART_RXEVENT_IDLE)
+	        {
+	    	  if(Rx_Buff_Index == 0) return;
+
+	    	  ModbusRxMsgTypeDef msg = {0};
+
+	          msg.len = Rx_Buff_Index;
+
+	          for(uint8_t i = 0; i < msg.len; i++)
+	          {
+	            msg.data[i] = Rx_Buff[i];
+	          }
+
+	          // Buff Index 초기화
+	          Rx_Buff_Index = 0;
+
+	          BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	          xQueueSendFromISR((QueueHandle_t)modbusQueueHandle, &msg, &xHigherPriorityTaskWoken);
+	          portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	        }
 }
 
 // 자기 sensor

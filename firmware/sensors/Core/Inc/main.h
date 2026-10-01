@@ -32,7 +32,21 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+
+/* USER CODE END Includes */
+
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
+
 // Sensors Data structure
+
+#define DMA_Rx_Lens	32
+
+/* USER CODE END ET */
+
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
+
 typedef struct
 {
 	float temp;
@@ -41,17 +55,6 @@ typedef struct
 	float dust_density;
 	uint8_t zone;
 } sensorData;
-
-/* USER CODE END Includes */
-
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-
 
 /* USER CODE END EC */
 
@@ -68,6 +71,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Fire_Check_Pin GPIO_PIN_14
+#define Fire_Check_GPIO_Port GPIOC
 #define Dust_LED_Pin GPIO_PIN_1
 #define Dust_LED_GPIO_Port GPIOC
 #define Dust_ADC_Pin GPIO_PIN_2
