@@ -133,11 +133,11 @@ IDLE event callback
 
 
 
-### Atuator Slave
+### Actuator Slave
 
 
 
-**ActuatorReisterMap**
+**ActuatorRegisterMap**
 
 
 
