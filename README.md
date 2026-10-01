@@ -133,24 +133,24 @@ IDLE event callback
 
 
 
-### Atuator Slave
+### Actuator Slave
 
 
 
-**ActuatorReisterMap**
+**ActuatorRegisterMap**
 
 
 
-- LF_MOTOR_RPM = 0x00
+- RF_MOTOR_RPM = 0x00
 
 
-- RF_MOTOR_RPM = 0x01
+- LF_MOTOR_RPM = 0x01
 
 
-- LR_MOTOR_RPM = 0x02
+- RR_MOTOR_RPM = 0x02
 
 
-- RR_MOTOR_RPM = 0x03
+- LR_MOTOR_RPM = 0x03
 
 
 
@@ -164,36 +164,40 @@ IDLE event callback
 
 ## 디버깅
 
+### 개발 보드 MCU 회로 손상
 하드웨어 구성 중 L298N 모터 드라이버 입력핀에서 개발 보드 GPIO OUTPUT핀으로 전류가 흘러 개발 보드 회로가 타는 상황 발생
 
-
-
 **해결방안**
-
-
 
 -> 입력핀에서 전류가 흘러도 문제상황이 발생하지 않도록 저항으로 보호 회로를 구성
 
-
-
+### 모터 드라이버 회로 구성중 로직 레벨오류
 L298N H-Bridge 회로의 EN핀이 GPIO 3.3V로 HIGH 로직을 받지 못하는 상황이 발생
-
-
 
 **해결방안**
 
-
-
 -> 모터의 역회전 기능을 포기하고 하드웨어 회로를 변경, EN핀에 점퍼캡을 끼우고, IN1핀 PWM, IN2 GND 방식으로 회로를 구성
 
+### Modbus 응답 에러율 약 20%
+Modbus protocol slave 응답의 에러율이 20%에 근사하는 상황 발생
+
+IDLEEventCallback의 문제로 추측하고 IDLE의 QueueSendFromISR직전의 로그를 출력하였다
+
+어느 특정 타이밍에서 수신 에러가 발생하고 있었고, 에러를 정확히 재현하기 위해 ST-LINK 디버거를 사용
+
+특정 타이밍의 수신 버퍼가 깨져있는 상황을 확인하였다.
+
+DMA Circular와 수신 버퍼의 크기 불일치로 수신 버퍼 외부의 메모리에 데이터가 넘어가는 상황이 발생하고 있었다.
+
+**해결방안**
+
+-> 수신버퍼와 DMA Circular의 길이를 정확히 맞춰 테스트 에러율 0%에 근사.
 
 
 ## 발견된 문제점
 
 
-
 5채널 IR센서중 가장 왼쪽 센서의 기능이 현저하게 떨어져 라인트레이싱에 치명적인 문제를 야기하고 있다.
 
-Modbus protocol slave 응답의 에러율이 20%에 근사 된다. UARTEventCallback의 idle flag 문제로 추측하고 있으며 라즈베리파이와 연동 되는 것을 확인 한 뒤 디버깅 할 예정이다.
 
 
