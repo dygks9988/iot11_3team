@@ -141,16 +141,16 @@ IDLE event callback
 
 
 
-- LF_MOTOR_RPM = 0x00
+- RF_MOTOR_RPM = 0x00
 
 
-- RF_MOTOR_RPM = 0x01
+- LF_MOTOR_RPM = 0x01
 
 
-- LR_MOTOR_RPM = 0x02
+- RR_MOTOR_RPM = 0x02
 
 
-- RR_MOTOR_RPM = 0x03
+- LR_MOTOR_RPM = 0x03
 
 
 
