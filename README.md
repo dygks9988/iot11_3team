@@ -104,6 +104,7 @@ DMA Circular와 수신 버퍼의 크기 불일치로 수신 버퍼 외부의 메
 **해결방안**
 
 -> 수신버퍼와 DMA Circular의 길이를 정확히 맞춰 테스트 에러율 0%에 근사.
+<img width="675" height="360" alt="image" src="https://github.com/user-attachments/assets/c6376608-6d79-4596-aea2-dafc299ef2fd" />
 
 
 ## 발견된 문제점
