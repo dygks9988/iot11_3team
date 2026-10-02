@@ -45,7 +45,19 @@ Slave Enviroment STM32
 
 **웹**
 
-- 웹 대쉬보드 틀
+- 대시보드
+- 환경 데이터 차트
+
+### 실물 테스트 함목
+- 웹 요청 (로봇 상태 제어)
+- 데이터 파이프라인
+
+### 추가 항목
+- MOTOR RPM 데이터 차트 (폐루프 제어에 유용)
+
+### 주의 사항
+- python app파일의 device seq와 테이블의 device seq가 일치 해야한다.
+
 
 
 
@@ -157,6 +169,7 @@ Sirial : UART,RS-485
 
 - ROBOT_STATE = 0x00
 
+### 프로젝트 일정상 Write Single coil의 응답을 후순위로 미루었다
 
 
 ## 디버깅
