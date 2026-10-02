@@ -61,7 +61,9 @@ Slave Enviroment STM32
 
 - 로봇 차체 구동부 배선 완료
 
-- Modbus protocol (Read coil,reg) (Write coil)등 제한된 기능 구현 
+- Modbus protocol (Read coil,reg) (Write coil)등 제한된 기능 구현
+
+- RS485 마스터, 슬레이브간 테스트 완료.
 
 
 
@@ -105,16 +107,11 @@ Slave Enviroment STM32
 
 
 
-## UART 계획
-
-DMA Circular
-
-IDLE event callback
-
 
 
 ## ModBUS Protocol
 
+Sirial : UART,RS-485
 
 
 제한된 기능만 사용
