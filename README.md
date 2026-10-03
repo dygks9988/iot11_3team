@@ -97,9 +97,9 @@ L298N H-Bridge 회로의 EN핀이 GPIO 3.3V로 HIGH 로직을 받지 못하는 �
 -> 모터의 역회전 기능을 포기하고 하드웨어 회로를 변경, EN핀에 점퍼캡을 끼우고, IN1핀 PWM, IN2 GND 방식으로 회로를 구성
 
 ### Modbus 응답 에러율 약 20%
-Modbus protocol slave 응답의 에러율이 20%에 근사하는 상황 발생
+Modbus protocol Actuator Slave 응답의 에러율이 20%에 근사하는 상황 발생
 
-IDLEEventCallback의 문제로 추측하고 IDLE의 QueueSendFromISR직전의 로그를 출력하였다
+IDLE EventCallback의 문제로 추측하고 Callback의 QueueSendFromISR직전의 수신버퍼 로그를 출력하였다
 
 어느 특정 타이밍에서 수신 에러가 발생하고 있었고, 에러를 정확히 재현하기 위해 ST-LINK 디버거를 사용
 
@@ -128,7 +128,7 @@ Serial : UART,RS-485
 
 
 
-**Function Code**
+### Function Code
 
 - Read_Coils
 
