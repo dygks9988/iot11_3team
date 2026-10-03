@@ -7,7 +7,7 @@
 
 라인 트레이싱 기반 이동형 로봇이 지정 경로를 자율 주행하며 환경 데이터를 수집하고, STM32와 Raspberry Pi 간 Modbus RTU 통신을 통해 센서 데이터, 모터 RPM, 로봇 동작 상태를 수집·모니터링하는 시스템이다.
 
-수집된 데이터는 DB에 저장하여 웹 대시보드에서 확인할 수 있으며,화재 감지용 카메라 영상을 실시간 스트리밍한다. 영상 기반 화재 후보 감지와 CO₂ 센서 데이터를 함께 활용하여 화재 상황을 판단하고, 화재가 감지되면 로봇을 자동 정지시킨 뒤 웹을 통해 상태를 확인할 수 있도록 구성하였다.
+수집된 데이터는 웹 대시보드에서 확인할 수 있으며 DB에 저장한다,화재 감지용 카메라 영상을 실시간 스트리밍한다. 영상 기반 화재 후보 감지와 CO₂ 센서 데이터를 함께 활용하여 화재 상황을 판단하고, 화재가 감지되면 로봇을 자동 정지시킨 뒤 웹을 통해 상태를 확인할 수 있도록 구성하였다.
 
 
 ## 대시보드
@@ -37,6 +37,15 @@ Slave Actuator STM32
 Slave Environment STM32
 
 ## 시스템 아키텍처
+
+### Integrated System
+<img width="800" height="1500" alt="image" src="https://github.com/user-attachments/assets/dfa8c086-7087-4eca-be66-0a45d9abaa67" />
+
+
+
+
+
+### Actuator
 <img width="700" height="550" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
 
 
