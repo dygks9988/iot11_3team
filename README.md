@@ -7,9 +7,16 @@
 
 라인 트레이싱 기반 이동형 로봇이 지정 경로를 자율 주행하며 환경 데이터를 수집하고, STM32와 Raspberry Pi 간 Modbus RTU 통신을 통해 센서 데이터, 모터 RPM, 로봇 동작 상태를 수집·모니터링하는 시스템이다.
 
-수집된 데이터는 DB에 저장하여 웹 대시보드에서 확인할 수 있으며, 카메라 영상을 실시간 스트리밍한다. 영상 기반 화재 후보 감지와 CO₂ 센서 데이터를 함께 활용하여 화재 상황을 판단하고, 화재가 감지되면 로봇을 자동 정지시킨 뒤 웹을 통해 상태를 확인할 수 있도록 구성하였다.
+수집된 데이터는 DB에 저장하여 웹 대시보드에서 확인할 수 있으며,화재 감지용 카메라 영상을 실시간 스트리밍한다. 영상 기반 화재 후보 감지와 CO₂ 센서 데이터를 함께 활용하여 화재 상황을 판단하고, 화재가 감지되면 로봇을 자동 정지시킨 뒤 웹을 통해 상태를 확인할 수 있도록 구성하였다.
+
+
+## 대시보드
+
+<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/954ac27b-6872-4a30-aee0-854471773595" />
 
 ## 라인트레이싱 동작 영상
+
+<img width="700" height="400" alt="line_tracking_demo_readme_" src="https://github.com/user-attachments/assets/ca46c798-3617-42ce-9b3b-e2e6d72c6281" />
 
 
 
@@ -45,7 +52,6 @@ Slave Environment STM32
 
 **실물 테스트 예정항목**
 - 웹 요청 (로봇 상태 제어)
-- 데이터 파이프라인
 
 **추가 항목**
 - MOTOR RPM 데이터 차트 (폐루프 제어에 유용)
@@ -56,8 +62,8 @@ Slave Environment STM32
 ### 라즈베리 파이
 - OpenCV 불꽃 감지 및 대응(모터 정지)
 - ModBUS Protocol Master 요청
-
 ---
+
 **구동부**
 
 - 5채널 IR 센서 기반 라인 트레이싱 로직 구현
