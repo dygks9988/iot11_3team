@@ -12,11 +12,12 @@
 
 ## 대시보드
 
-<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/954ac27b-6872-4a30-aee0-854471773595" />
+<img width="700" height="500" alt="trimmed_after10" src="https://github.com/user-attachments/assets/1fd2d9a4-d585-4687-ada0-4b9e62e98e2d" />
+
 
 ## 라인트레이싱 동작 영상
 
-<img width="700" height="400" alt="line_tracking_demo_readme_" src="https://github.com/user-attachments/assets/ca46c798-3617-42ce-9b3b-e2e6d72c6281" />
+<img width="700" height="500" alt="line_tracking_demo_readme_" src="https://github.com/user-attachments/assets/ca46c798-3617-42ce-9b3b-e2e6d72c6281" />
 
 
 
