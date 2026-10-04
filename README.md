@@ -20,6 +20,11 @@
 <img width="700" height="500" alt="line_tracking_demo_readme_" src="https://github.com/user-attachments/assets/ca46c798-3617-42ce-9b3b-e2e6d72c6281" />
 
 
+## 시스템 로그
+
+
+<img width="640" height="512" alt="robot_log" src="https://github.com/user-attachments/assets/a240559f-0fa1-4249-a400-4a629ca4b8c4" />
+
 
 ## 시스템 구상도
 
