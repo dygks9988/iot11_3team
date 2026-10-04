@@ -52,7 +52,7 @@ Slave Environment STM32
 
 
 ### Actuator
-<img width="700" height="550" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
+<img width="1000" height="750" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
 
 
 
