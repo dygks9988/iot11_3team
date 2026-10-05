@@ -64,15 +64,11 @@ Slave Environment STM32
 - 대시보드
 - 환경 데이터 차트
 - 영상 스트리밍
-
-**실물 테스트 예정항목**
 - 웹 요청 (로봇 상태 제어)
 
 **추가 항목**
 - MOTOR RPM 데이터 차트 (폐루프 제어에 유용)
 
-**주의 사항**
-- python app파일의 device seq와 테이블의 device seq가 일치 해야한다.
 ---
 ### 라즈베리 파이
 - OpenCV 불꽃 감지 및 대응(모터 정지)
@@ -94,6 +90,10 @@ Slave Environment STM32
 - Modbus protocol (Read coil,reg) (Write coil)등 제한된 기능 구현
 
 - RS485 마스터, 슬레이브간 테스트 완료.
+
+**개선 사항**
+- 직접 조종 모드(웹에서 자율주행과 직접조종을 토글)
+- 초음파 센서기반 Deadline을 맞춘 real time 정지 정책
 
 ## 디버깅
 
