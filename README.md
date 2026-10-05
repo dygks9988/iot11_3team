@@ -65,9 +65,17 @@ Slave Environment STM32
 ### Actuator
 <img width="1000" height="750" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
 
-<img width="1000" height="500" alt="image" src="https://github.com/user-attachments/assets/0238d2ca-b41c-4962-9635-dcaaa9cede25" />
+<img width="1031" height="378" alt="image" src="https://github.com/user-attachments/assets/20672c0e-7f6d-4c78-ab27-e14add207544" />
 
 
+| 측정 항목 | 측정 결과 | 의미 |
+|---|---:|---|
+| ADC DMA Complete ISR | 4.128 µs | ADC DMA 완료 인터럽트 처리 시간 |
+| Motor Instruction Task | 2.76 µs | 센서값 판단 및 모터 명령 생성 시간 |
+| Actuator Task | 3.00 µs | 명령 수신 후 모터 출력 반영 시간 |
+| End-to-End Latency | 32.625 µs | ADC DMA 완료부터 Actuator 출력 반영까지의 전체 지연시간 |
+| Control Period | 10.000637 ms | 제어 루프 실행 주기 |
+| Control Frequency | 99.99 Hz | 제어 루프 동작 주파수 |
 
 ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-to-End latency를 GPIO 토글과 Logic Analyzer로 측정한 결과
 
