@@ -42,6 +42,17 @@ Slave Actuator STM32
 
 Slave Environment STM32
 
+## 역할 분담
+### 이요한
+- 전체 시스템 아키텍처 설계 및 시스템 통합
+- STM32 구동부 펌웨어 및 FreeRTOS 기반 제어 구조 설계
+- Modbus RTU 기반 Master–Slave 통신 구조 설계 및 구동부 프로토콜 처리 로직 구현
+- 라인트레이싱 및 모터 제어 로직 구현
+- Raspberry Pi Flask 프로그램 작성
+### 홍원표
+### 박지우
+
+
 ## 시스템 아키텍처
 
 ### Integrated System
@@ -54,8 +65,13 @@ Slave Environment STM32
 ### Actuator
 <img width="1000" height="750" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
 
+<img width="1000" height="500" alt="image" src="https://github.com/user-attachments/assets/0238d2ca-b41c-4962-9635-dcaaa9cede25" />
 
 
+
+ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-to-End latency를 GPIO 토글과 Logic Analyzer로 측정한 결과
+
+약 14.65 µs였으며, 10 ms 제어 주기 대비 충분한 실행 여유를 확인하였다.
 
 ## 현재 구현 상태
 
