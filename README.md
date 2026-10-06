@@ -80,7 +80,7 @@ Slave Environment STM32
 
 ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-to-End latency를 GPIO 토글과 Logic Analyzer로 측정한 결과
 
-약 14.65 µs였으며, 10 ms 제어 주기 대비 충분한 실행 여유를 확인하였다.
+약 32.625 µs였으며, 10 ms 제어 주기 대비 충분한 실행 여유를 확인하였다.
 
 ## 현재 구현 상태
 
