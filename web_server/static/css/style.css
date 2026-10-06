@@ -30,7 +30,7 @@ body {
     display: flex;                         
     flex-direction: column;               
     justify-content: center;            
-    padding: 30 !important;    
+    padding: 30px !important;    
     overflow: hidden;                   
 }
 
@@ -73,3 +73,223 @@ body {
     color: #334155;
     white-space: nowrap; 
 }
+
+/* ===== 화재 감지 모니터 ===== */
+.fire-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+}
+
+.fire-cam-card,
+.fire-status-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(20, 17, 17, 0.336);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.3s ease;
+}
+
+/* 캠 카드는 2칸 차지 */
+.fire-cam-card {
+    grid-column: span 2;
+}
+
+.fire-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fire-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+/* LIVE 배지 */
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background: #dc2626;
+    border-radius: 50%;
+    animation: live-blink 1.2s infinite;
+}
+
+@keyframes live-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.25; }
+}
+
+/* 캠 화면 */
+.fire-video-box {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.fire-video-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 상태 카드 */
+.fire-status-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.fire-status-circle {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #dcfce7;
+    border: 3px solid #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    transition: all 0.3s ease;
+}
+
+.fire-status-text {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #16a34a;
+}
+
+.fire-sub-text {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.fire-time-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    min-height: 1.1em;
+}
+
+/* 화재 감지됨 */
+.fire-status-card.danger {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+    animation: fire-pulse 1s infinite;
+}
+
+.fire-status-card.danger .fire-status-circle {
+    background: #fee2e2;
+    border-color: #dc2626;
+}
+
+.fire-status-card.danger .fire-status-text {
+    color: #dc2626;
+}
+
+@keyframes fire-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25); }
+    50%      { box-shadow: 0 0 0 9px rgba(239, 68, 68, 0.08); }
+}
+
+/* 반응형 (맨 끝에 둘 것) */
+@media (max-width: 1024px) {
+    .fire-grid { grid-template-columns: 1fr; }
+    .fire-cam-card { grid-column: span 1; }
+}
+
+/* ===== 로봇 주행 상태 ===== */
+.tag-gray { background: #e2e8f0; color: #475569; }
+
+.motor-rpm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.motor-rpm-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 6px 12px;
+}
+
+.motor-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.motor-value {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+/* ===== 헤더 로봇 ON/OFF 버튼 ===== */
+.robot-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+
+.robot-toggle::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.robot-toggle.off { background: #e2e8f0; color: #475569; }
+.robot-toggle.on  { background: #dcfce7; color: #16a34a; }
+
+.robot-toggle:hover    { filter: brightness(0.97); }
+.robot-toggle:active   { transform: scale(0.96); }
+.robot-toggle:disabled { opacity: 0.6; cursor: wait; }

@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from picamera2 import Picamera2
 
+
 # 노출 고정 (마이크로초). 얼굴/천장은 어둡고 불꽃만 밝게 보이도록 조정
 EXPOSURE_US = 2000
 

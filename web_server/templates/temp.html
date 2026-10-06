@@ -33,62 +33,99 @@
     const chartsData = {{ chart | tojson | safe }};
     const rawData = formatToSingleTimeSeries(chartsData);
 
-    function createChartConfig(datas) {
-        return {
-            type: 'line',
-            data: {
-                datasets: [{
-                    data: datas,
-                }]
+   function createChartConfig(datas, title) {
+    return {
+        type: 'line',
+
+        data: {
+            datasets: [{
+                data: datas,
+
+                tension: 0.25,
+                borderWidth: 2,
+
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointHitRadius: 10
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            interaction: {
+                mode: 'nearest',
+                intersect: false
             },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                title: {
+                    display: true,
+                    text: title,
+                    align: 'start',
+                    padding: {
+                        bottom: 15
                     },
-                    title: {
-                        display: true,
-                        text: '온도 (°C)',
-                        align: 'start',
-                        padding: {
-                            bottom: 10
-                        },
-                        font: {
-                            weight: 'bold'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: function(context) {
-                                return `${context[0].label}`;
-                            },
-                            label: function(context) {
-                                const raw = context.raw;
-                                return ` [구역 ${raw.point}] 온도: ${raw.y}°C`;
-                            }
-                        }
+                    font: {
+                        size: 14,
+                        weight: 'bold'
                     }
                 },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            parser: 'HH:mm',
-                            unit: 'hour',
-                            displayFormats: { hour: 'HH:mm' }
+
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
                         },
-                        min: '00:00',
-                        max: '23:59',
+
+                        label: function(context) {
+                            const raw = context.raw;
+                            return `온도: ${raw.y}°C`;
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    type: 'time',
+
+                    time: {
+                        parser: 'HH:mm',
+                        unit: 'hour',
+                        displayFormats: {
+                            hour: 'HH:mm'
+                        }
                     },
-                    y: {
-                        beginAtZero: false,
-                        min: 10,
-                        max: 50,
+
+                    ticks: {
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 8
+                    },
+
+                    grid: {
+                        display: false
+                    }
+                },
+
+                y: {
+                    beginAtZero: false,
+                    grace: '10%',
+
+                    ticks: {
+                        maxTicksLimit: 6
                     }
                 }
             }
-        };
-    }
+        }
+    };
+}
 
     const ctx1 = document.getElementById('today');
     const todayChart = new Chart(ctx1, createChartConfig(rawData));
