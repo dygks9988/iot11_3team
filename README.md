@@ -55,17 +55,18 @@ Slave Environment STM32
 
 ## 시스템 아키텍처
 
-### Integrated System
-<img width="800" height="1500" alt="image" src="https://github.com/user-attachments/assets/dfa8c086-7087-4eca-be66-0a45d9abaa67" />
+  ### Integrated System
+<img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/f4def5d1-ea76-4a96-b0f6-3b00172e4ec3" />
+
 
 
 
 
 
 ### Actuator
-<img width="1000" height="750" alt="SlaveSys (1)" src="https://github.com/user-attachments/assets/2fbe875c-5c45-4f15-b5ec-27d555f7bbf8" />
 
-<img width="1031" height="378" alt="image" src="https://github.com/user-attachments/assets/20672c0e-7f6d-4c78-ab27-e14add207544" />
+<img width="1000" height="700" alt="image" src="https://github.com/user-attachments/assets/407d7064-0888-4759-b391-8e102d21b40d" />
+
 
 
 | 측정 항목 | 측정 결과 | 의미 |
