@@ -153,10 +153,9 @@ DMA Circular와 수신 버퍼의 크기 불일치로 수신 버퍼 외부의 메
 <img width="675" height="360" alt="image" src="https://github.com/user-attachments/assets/c6376608-6d79-4596-aea2-dafc299ef2fd" />
 
 
-## 발견된 문제점
+5채널 IR센서중 가장 왼쪽 센서의 기능이 현저하게 떨어져 라인트레이싱에 치명적인 문제를 야기하고 있다 - > 센서 교체를 통해 해결하였다.
 
 
-5채널 IR센서중 가장 왼쪽 센서의 기능이 현저하게 떨어져 라인트레이싱에 치명적인 문제를 야기하고 있다.
 
 
 ## ModBUS Protocol
@@ -208,41 +207,6 @@ Serial : UART,RS-485
 - ROBOT_STATE = 0x00
 
 **프로젝트 일정상 Write Single coil의 응답을 후순위로 미루었다**
-
-
-## 주요 데이터 흐름 (Legacy)
-
-**SW**
-
-
-
-
-
-<img width="549" height="412" alt="image" src="https://github.com/user-attachments/assets/fb23e3ad-ec43-4149-9472-9f8d68355d29" />
-
-
-
-<img width="549" height="412" alt="image" src="https://github.com/user-attachments/assets/1ff7f645-6c25-4663-b0d9-bb12617ef6de" />
-
-
-
-
-
-
-
-초기 버전 SW구성도,팀원의 이해를 돕기 위해 슈퍼루프로 비선점형 태스크를 모방 하였다.
-
-
-
-추후 선점형 태스크로 우선순위를 부여할 예정이다.
-
-
-
-이동형 시스템이 동작하기 위한 최소 기준이다.
-
-
-
-추후 일정이 된다면 모터 PID 루프 구조로 주행 안정성을 높이고, 초음파 기반 안전 정지 구현을 고려중이다.
 
 
 
