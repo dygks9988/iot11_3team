@@ -11,11 +11,11 @@
 #include "c_stdlib.h"
 
 // UART 8E1 or 8N2를 사용해야함
-// Actuator Slave addr 0x01
+// Actuator Slave addr 0x02
 
 // Modbus Request Frame RTU
 
-#define MODBUS_UART_CH 6
+#define MODBUS_UART_CH 3
 
 typedef enum{
 	ENVIROMENT_SALVE_ADDR = 0x01,

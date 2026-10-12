@@ -25,9 +25,9 @@ void mode_change(Robot_ModeTypeDef* mode,Robot_CmdTypeDef cmd){
 		if(*mode != ROBOT_IDLE){
 			*mode = ROBOT_IDLE;
 			HAL_TIM_Base_Stop(&htim8);
-			break;
-		}
 
+		}
+		break;
 	case ROBOT_CMD_START:
 		if(*mode != ROBOT_DRIVING){
 			*mode = ROBOT_DRIVING;

@@ -9,12 +9,12 @@
 #include "adc.h"
 #include "tim.h"
 
-#define IR_THRESHOLD 2000
+#define IR_THRESHOLD 1700
 #define IR_NB 5
 
 
-#define KP 15
-#define KD 0 // todo
+#define KP 18
+#define KD 0.03 // todo
 #define DT 0.01f
 
 
@@ -72,7 +72,6 @@ static IRSensor_State_TypeDef line_detect(int8_t* error, uint16_t* ir_sensor){
 
     // 에러 확인
     if(high_cnt == 0)ir_state = IR_STATE_NONE;
-    else if(high_cnt >= 3)ir_state= IR_STATE_ERROR;
     else ir_state= IR_STATE_NORMAL;
 
     // 오차 생성
@@ -156,8 +155,8 @@ bool motor_instruction_create(Motor_Instruction_MsgTypeDef* Instruction_Msg,uint
     int16_t correction;
 
     // @todo 모드별 RPM
-    int16_t right_mode_rpm = 70;
-    int16_t left_mode_rpm = 70;
+    int16_t right_mode_rpm = 65;
+    int16_t left_mode_rpm = 65;
 
     IRSensor_State_TypeDef ir_state = line_detect(&error,ir_sensor);
 

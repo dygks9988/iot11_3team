@@ -114,7 +114,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM6_Init();
   MX_TIM8_Init();
-  MX_USART6_UART_Init();
+  MX_USART3_UART_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -122,7 +122,7 @@ int main(void)
   line_sensor_init();
   actuator_init();
   rtos_init();
-  Uart_Init(&huart6);
+  Uart_Init(&huart3);
 
   //ENCODER
 //  HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL);

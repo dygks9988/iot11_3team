@@ -13,6 +13,8 @@
 #include "actuator.h"
 #include "msg.h"
 
+#include "gpio.h"
+
 void actuator_task(){
 	Motor_Instruction_MsgTypeDef receive_msg = {0,0};
 	for(;;){

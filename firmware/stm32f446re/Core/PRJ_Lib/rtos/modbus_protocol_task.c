@@ -28,8 +28,6 @@ void modbus_protocol_task(){
 	for(;;){
 		xQueueReceive(modbQueueHandle,&msg, portMAX_DELAY);
 
-
-
 		memset(&modb_resp_frame, 0, sizeof(modb_resp_frame));
 		memset(&modb_parser, 0, sizeof(modb_parser));
 
@@ -103,7 +101,9 @@ void modbus_protocol_task(){
 							cmd = ROBOT_CMD_START;
 						}
 						xQueueSend(modeQueueHandle,&cmd,10);
+
 					}
+					break;
 				default:
 					break;
 			}

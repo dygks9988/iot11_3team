@@ -242,12 +242,20 @@ void Uart_Init(UART_HandleTypeDef *huart)
     huart2.hdmarx->Instance->CR &= ~DMA_SxCR_HTIE; // 최초 호출 시에도 HT 인터럽트 차단!
   #endif
  }
+ if(huart->Instance == USART3){
+ #if IDLE_DMA_Circular_Mode_ch3
+     HAL_UARTEx_ReceiveToIdle_DMA(&huart3, &rx_d -> Rx_data_3, DMA_Rx_Lens);
+     huart3.hdmarx->Instance->CR &= ~DMA_SxCR_HTIE; // 최초 호출 시에도 HT 인터럽트 차단!
+
+ #endif
+ }
     if(huart->Instance == USART6){
 #if IDLE_DMA_Circular_Mode_ch6
     HAL_UARTEx_ReceiveToIdle_DMA(&huart6, &rx_d -> Rx_data_6, DMA_Rx_Lens);
     huart6.hdmarx->Instance->CR &= ~DMA_SxCR_HTIE; // 최초 호출 시에도 HT 인터럽트 차단!
-    }
+
 #endif
+    }
 
 }
 
@@ -713,6 +721,8 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 
 
 #if USART_Ch_2_EN
+  if(huart->Instance == USART2) //  [수정] 누락되었던 USART2 인스턴스 확인 조건문 추가
+     {
     #if RTOS_Queue_Mode
 	  // ISR에서 Queue로 데이터 전송
 	  // 자료형 선언 = FreeRTOS 기본 정수 타입 (int 비슷, 4Byte)
@@ -818,6 +828,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
              // 재장전
              HAL_UARTEx_ReceiveToIdle_DMA(&huart2, &rx_d -> Rx_data_2, DMA_Rx_Lens);
    #endif
+     }
 #endif
 
 
@@ -847,8 +858,57 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
       HAL_UARTEx_ReceiveToIdle_IT(&huart3, (uint8_t *)&rx_d -> Rx_data_3, 20); // 50 Byte rx
    #elif IDLE_DMA_Circular_Mode_ch3
       // DMA가 반전송 또는 완료 후 자동으로 재시작되지 않게 설정
-      __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
-      rx_flag -> rx_end_flag_3 = 1;
+      uint32_t event = HAL_UARTEx_GetRxEventType(huart);
+      uint16_t dma_pos = Size;
+      uint16_t old_pos = dma_old_pos;
+      uint16_t length = 0;
+
+      // 1. 순환 버퍼(Circular) 구조에서 정확한 데이터 길이 계산
+      if(dma_pos >= old_pos) length = dma_pos - old_pos;
+      else length = DMA_Rx_Lens - old_pos + dma_pos;
+
+      // 2. 새로 들어온 길이만큼 복사 (인덱스 유지하면서 Rx_Buff에 누적)
+       for(uint16_t i = 0; i < length; i++)
+        {
+          rx_d->Rx_Buff[rx_cnt->rx_cnt_3] = rx_d->Rx_data_3[(old_pos + i) % DMA_Rx_Lens];
+          rx_cnt->rx_cnt_3++;
+
+          if(rx_cnt->rx_cnt_3 >= DMA_Rx_Lens)
+           {
+           rx_cnt->rx_cnt_3 = 0; // 버퍼 오버플로우 방지 (처음으로 롤백)
+           }
+
+        }
+
+       // 현재 위치를 다음 번 처리를 위해 저장
+       dma_old_pos = dma_pos;
+
+
+       if(event == HAL_UART_RXEVENT_IDLE)
+        {
+
+    	   // 프로젝트용 queue 로직
+    	   ModbusRxMsgTypeDef msg = {0};
+
+    	   msg.len = rx_cnt->rx_cnt_3;
+
+    	   for(uint8_t i = 0; i < msg.len; i++){
+    	       msg.data[i] = rx_d->Rx_Buff[i];
+    	   }
+
+#if debugging
+         printf("SIZE=%u OLD=%u LEN=%u FRAME_LEN=%u EVENT=%lu\r\n", Size, old_pos, length,msg.len, event);
+       	#endif
+    	   // 다음 파싱을 위해 초기화
+    	   rx_cnt->rx_cnt_3 = 0;
+    	   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    	   	//xHigherPriorityTaskWoken = 전환 필요 여부 표시
+    	   xQueueSendFromISR(modbQueueHandle,&msg,&xHigherPriorityTaskWoken);
+    	   	  // 필요 시 컨텍스트 스위칭 = ISR이 끝난 뒤 바로 Task로 전환 가능
+    	   	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+        }
+
    #elif IDLE_DMA_Normal_Mode_ch3
       HAL_UARTEx_ReceiveToIdle_DMA(&huart3, (uint8_t *)&rx_d -> Rx_data_3, 20);//rx_d -> Rx_buff_size); // 50 Byte rx
       // DMA가 반전송 또는 완료 후 자동으로 재시작되지 않게 설정
@@ -983,20 +1043,20 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
           rx_d->Rx_Buff[rx_cnt->rx_cnt_6] = rx_d->Rx_data_6[(old_pos + i) % DMA_Rx_Lens];
           rx_cnt->rx_cnt_6++;
 
-          if(rx_cnt->rx_cnt_6 >= DMA_Rx_Lens)
-           {
-            rx_cnt->rx_cnt_6 = 0; // 버퍼 오버플로우 방지 (처음으로 롤백)
-           }
+//          if(rx_cnt->rx_cnt_6 >= DMA_Rx_Lens)
+//           {
+//            rx_cnt->rx_cnt_6 = 0; // 버퍼 오버플로우 방지 (처음으로 롤백)
+//           }해당 프로젝트에서 cnt를 rx_len으로 사용하기 위해 큐에 넣고 나서 초기화 하는 것으로 변경
+
         }
 
        // 현재 위치를 다음 번 처리를 위해 저장
        dma_old_pos = dma_pos;
 
-       #if debugging
-         printf("SIZE=%u OLD=%u LEN=%u EVENT=%lu\r\n", Size, old_pos, length, event);
-       #endif
+
        if(event == HAL_UART_RXEVENT_IDLE)
         {
+
     	   // 프로젝트용 queue 로직
     	   ModbusRxMsgTypeDef msg = {0};
 
@@ -1006,6 +1066,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     	       msg.data[i] = rx_d->Rx_Buff[i];
     	   }
 
+#if debugging
+         printf("SIZE=%u OLD=%u LEN=%u FRAME_LEN=%u EVENT=%lu\r\n", Size, old_pos, length,msg.len, event);
+       	#endif
     	   // 다음 파싱을 위해 초기화
     	   rx_cnt->rx_cnt_6 = 0;
     	   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -1017,9 +1080,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         }
     #endif
   }
-#endif
 
+#endif
 }
+
 
 
 

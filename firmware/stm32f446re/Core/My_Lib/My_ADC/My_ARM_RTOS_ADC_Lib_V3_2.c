@@ -880,12 +880,17 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* adcHandle)
 #if ADC_Reg_DMA_Nomal_Mode || ADC_Reg_DMA_Circular_Mode
 	//adc -> reg_ad_end_flag = 1; //rtos = dma방식
 
+
+
+
 	// 프로젝트용 rtos semaphore
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	xSemaphoreGiveFromISR(adcSemaphoreHandle , &xHigherPriorityTaskWoken);
 	// 필요하면 context switch
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+
 
 
    #if ADC_Reg_DMA_Nomal_Mode

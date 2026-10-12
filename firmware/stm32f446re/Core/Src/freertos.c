@@ -212,7 +212,7 @@ void encoder(void *argument)
 
 	  if(sec_flag == 1){
 		  sec_flag = 0;
-		  dis_rpm();
+	//	  dis_rpm();
 	  }
 	 vTaskDelayUntil(&xLastWakeTime,50);
   }

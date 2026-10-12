@@ -53,20 +53,21 @@
 
 //#define debugging   1
 
-#define DMA_Rx_Lens  30
+#define DMA_Rx_Lens  32
 
 
 // App Define
 #define My_Uart_LIB_EN  1
 #define Console_Ch2		2
 //#define USART_Ch_2_EN	3
-//#define USART_Ch_3_EN	4
+#define USART_Ch_3_EN	4
 //#define USART_Ch_1_EN	4
-#define USART_Ch_6_EN	5
+//#define USART_Ch_6_EN	5
 #define IDEL_Mode       6
 //#define RTOS_Queue_Mode 7
 //#define RTOS_Queue_Mode_IDLE 8
-#define IDLE_DMA_Circular_Mode_ch6 7
+#define IDLE_DMA_Circular_Mode_ch3 7
+
 
 #if IDEL_Mode
 // IDLE CH1
@@ -82,7 +83,7 @@
 // IDLE CH3
 //#define IDLE_IRQ_Mode_Ch3   9 // Interrupt Mode
 //#define IDLE_DMA_Normal_Mode_ch3  10 // DMA Normal_Mode
-//#define IDLE_DMA_Circular_Mode_ch3  11 // DMA Circular Mode
+#define IDLE_DMA_Circular_Mode_ch3  11 // DMA Circular Mode
 
 // IDLE CH4
 //#define IDLE_IRQ_Mode_Ch4   9 // Interrupt Mode
@@ -97,7 +98,7 @@
 // IDLE CH6
 //#define IDLE_IRQ_Mode_Ch6   9 // Interrupt Mode
 //#define IDLE_DMA_Normal_Mode_ch6  10 // DMA Normal_Mode
-#define IDLE_DMA_Circular_Mode_ch6  11 // DMA Circular Mode
+//#define IDLE_DMA_Circular_Mode_ch6  11 // DMA Circular Mode
 
 
 
@@ -188,7 +189,7 @@ typedef struct
  {
   volatile uint8_t Rx_data_1[20];  // uart 1 rx_buf
   volatile uint8_t Rx_data_2[20];  // uart 2 rx_buf
-  volatile uint8_t Rx_data_3[20];  // uart 3 rx_buf
+  volatile uint8_t Rx_data_3[DMA_Rx_Lens];  // uart 3 rx_buf
   volatile uint8_t Rx_data_4[20];  // uart 3 rx_buf
   volatile uint8_t Rx_data_5[20];  // uart 3 rx_buf
   volatile uint8_t Rx_data_6[20];  // 2023, 08, 06 inc

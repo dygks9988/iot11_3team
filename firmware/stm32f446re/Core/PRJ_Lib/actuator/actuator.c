@@ -48,8 +48,8 @@ static Dc_Motor_HandleTypeDef jgb_hdcmotor[2] = {
         .pwm_channel = TIM_CHANNEL_1,
         .encoder_htim = &htim2,
 		.encoder_cpr = JGB_CPR,
-		.ccr_gain = 1.65,
-		.min_ccr = 100
+		.ccr_gain = 1.95,
+		.min_ccr = 0
     },
     {
         .target_rpm = 0,
@@ -59,8 +59,8 @@ static Dc_Motor_HandleTypeDef jgb_hdcmotor[2] = {
         .pwm_channel = TIM_CHANNEL_2,
         .encoder_htim = &htim3,
 		.encoder_cpr = JGB_CPR,
-		.ccr_gain = 1.45,
-		.min_ccr = 100
+		.ccr_gain = 1.75,
+		.min_ccr = 0
     }
 };
 
@@ -73,8 +73,8 @@ static Dc_Motor_HandleTypeDef jga_hdcmotor[2] = {
         .pwm_channel = TIM_CHANNEL_3,
         .encoder_htim = &htim4,
 		.encoder_cpr = JGA_CPR,
-		.ccr_gain = 1.45,
-		.min_ccr = 100
+		.ccr_gain = 1.75,
+		.min_ccr = 0
     },
     {
         .target_rpm = 0,
@@ -84,8 +84,8 @@ static Dc_Motor_HandleTypeDef jga_hdcmotor[2] = {
         .pwm_channel = TIM_CHANNEL_4,
         .encoder_htim = &htim5,
 		.encoder_cpr = JGA_CPR,
-		.ccr_gain = 1.35,
-		.min_ccr = 100
+		.ccr_gain = 1.65,
+		.min_ccr = 0
     }
 };
 
@@ -103,7 +103,10 @@ Dc_Motor_HandleTypeDef* left_dcmotor_rear = &jgb_hdcmotor[1];
 
 // 모터의 저속 구간에 바퀴가 돌지 않는 문제를 해결하기 위해 min ccr 연산 추가
 static inline uint32_t rpm_to_ccr(Dc_Motor_HandleTypeDef* dc) {
+	if (dc->target_rpm == 0)return 0;
+
 	if(dc->target_rpm > dc->max_rpm)dc->target_rpm = dc->max_rpm;
+
 	uint32_t ccr;
 	ccr = (uint32_t)(dc->target_rpm) * DC_ARR / dc->max_rpm * dc->ccr_gain;
 
