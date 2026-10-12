@@ -1,4 +1,4 @@
-﻿from typing import Optional
+from typing import Optional
 import datetime
 import decimal
 
@@ -36,6 +36,5 @@ class DeviceLog(Base):
     value_code: Mapped[str] = mapped_column(CHAR(4), nullable=False)
     value: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     recorded_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
-    recorded_point: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
 
     device: Mapped['Device'] = relationship('Device', back_populates='device_log')

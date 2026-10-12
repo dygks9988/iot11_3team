@@ -354,9 +354,7 @@
             <div class="time-badge">
                 📅 <span id="clockDisplay">로딩 중...</span>
             </div>
-            <div class="system-badge">
-                시스템 정상
-            </div>
+            <button id="robotToggleBtn" class="robot-toggle off" onclick="toggleRobot()">로봇 OFF</button>
         </div>
     </div>
 
@@ -444,96 +442,78 @@
 
         </div>
     </div>
-
-    <!-- 로봇 장비 및 관제 상태 카드 -->
-    <div class="section-title">🤖 로봇 장비 및 관제 상태</div>
+    <!-- 로봇 주행 상태 -->
+    <div class="section-title">🚗 로봇 주행 상태</div>
     <div class="status-card-grid">
+
+        <!-- 로봇 상태 -->
         <div class="smart-card">
             <div class="card-top">
-                <div class="card-icon">🔋</div>
+                <div class="card-icon">🤖</div>
                 <div class="card-info-text">
-                    <span class="sensor-name">배터리 상태</span>
+                    <span class="sensor-name">로봇 상태</span>
                     <div class="sensor-value-box">
-                        <span class="sensor-value">78</span>
-                        <span class="sensor-unit">%</span>
+                        <span class="sensor-value" id="robotStateText">--</span>
                     </div>
                 </div>
             </div>
             <div class="card-bottom">
-                <div class="battery-bar-bg">
-                    <div class="battery-bar-fill"></div>
-                </div>
+                <span class="status-tag tag-gray" id="robotStateTag">데이터 대기 중</span>
             </div>
         </div>
 
+        <!-- 평균 속도 -->
         <div class="smart-card">
             <div class="card-top">
-                <div class="card-icon">🔌</div>
+                <div class="card-icon">⚡</div>
                 <div class="card-info-text">
-                    <span class="sensor-name">로봇 전원 상태</span>
+                    <span class="sensor-name">평균 속도</span>
                     <div class="sensor-value-box">
-                        <span class="sensor-value" style="color: #16a34a;">ON</span>
+                        <span class="sensor-value" id="avgRpm">--</span>
+                        <span class="sensor-unit">RPM</span>
                     </div>
                 </div>
             </div>
-            <div class="card-bottom" style="justify-content: flex-start;">
-                <span class="status-tag tag-green">정상 작동 중</span>
+            <div class="card-bottom">
+                <span class="status-tag tag-blue">모터 4개 평균</span>
             </div>
         </div>
 
+        <!-- 모터별 속도 -->
         <div class="smart-card">
-            <div class="card-top">
-                <div class="card-icon">📡</div>
-                <div class="card-info-text">
-                    <span class="sensor-name">데이터 수신 상태</span>
-                    <div class="sensor-value-box">
-                        <span class="sensor-value" style="color: #2563eb;">Online</span>
-                    </div>
+            <span class="sensor-name">⚙️ 모터별 속도</span>
+            <div class="motor-rpm-grid">
+                <div class="motor-rpm-item"><span class="motor-label">모터 1</span><span class="motor-value" id="rpm-0">--</span></div>
+                <div class="motor-rpm-item"><span class="motor-label">모터 2</span><span class="motor-value" id="rpm-1">--</span></div>
+                <div class="motor-rpm-item"><span class="motor-label">모터 3</span><span class="motor-value" id="rpm-2">--</span></div>
+                <div class="motor-rpm-item"><span class="motor-label">모터 4</span><span class="motor-value" id="rpm-3">--</span></div>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- 화재 감지 모니터 -->
+        <div class="section-title">🔥 화재 감지 모니터</div>
+        <div class="fire-grid">
+
+            <!-- 왼쪽: 캠 화면 -->
+            <div class="fire-cam-card">
+                <div class="fire-video-box">
+                    <img src="/video_feed" width="640" height="480" alt="화재 감지 화면"
+                         onerror="this.style.display='none'; this.parentNode.innerText='영상을 불러올 수 없습니다';">
                 </div>
             </div>
-            <div class="card-bottom" style="justify-content: flex-start;">
-                <span class="status-tag tag-blue">실시간 수신 중 (2초 주기)</span>
+
+            <!-- 오른쪽: 화재 감지 상태 -->
+            <div class="fire-status-card" id="fireCard">
+                <div class="fire-status-icon" id="fireIcon">🟢</div>
+                <div class="fire-status-text" id="fireStatusText">정상</div>
+                <div class="fire-sub-text" id="fireSubText">불꽃이 감지되지 않았습니다.</div>
+                <div class="fire-time-text" id="fireTimeText"></div>
             </div>
-        </div>
+
     </div>
-
-    <!-- 라인트레이서 순환 주행 트랙 -->
-    <div class="section-title">🗺️ 라인트레이서 실시간 순환 주행 트랙</div>
-    <div class="route-map-card">
-        <div class="dense-track-container">
-            <div class="dense-node-box" id="map-pt1">
-                <span class="active-robot-tag">🤖 수집 중</span>
-                <span class="point-title-text">Point 1</span>
-                <span class="point-sub-text">구간 1</span>
-            </div>
-
-            <span class="track-arrow">➔</span>
-
-            <div class="dense-node-box active" id="map-pt2">
-                <span class="active-robot-tag">🤖 수집 중</span>
-                <span class="point-title-text">Point 2</span>
-                <span class="point-sub-text">구간 2</span>
-            </div>
-
-            <span class="track-arrow">➔</span>
-
-            <div class="dense-node-box" id="map-pt3">
-                <span class="active-robot-tag">🤖 수집 중</span>
-                <span class="point-title-text">Point 3</span>
-                <span class="point-sub-text">구간 3</span>
-            </div>
-
-            <span class="track-arrow">➔</span>
-
-            <div class="dense-node-box" id="map-pt4">
-                <span class="active-robot-tag">🤖 수집 중</span>
-                <span class="point-title-text">Point 4</span>
-                <span class="point-sub-text">구간 4</span>
-            </div>
-
-            <span class="track-arrow">➔ (구간 1 순환)</span>
-        </div>
-    </div>
+    
 </div>
 {% endblock %}
 
@@ -638,7 +618,204 @@
             })
             .catch(error => console.error("API 연동 오류:", error));
     }
-    fetchSensorData();
-    setInterval(fetchSensorData, 2000);
+
+    function fetchFire() {
+    fetch('/api/fire')
+        .then(response => response.json())
+        .then(data => {
+            const card = document.getElementById('fireCard');
+            const icon = document.getElementById('fireIcon');
+            const statusText = document.getElementById('fireStatusText');
+            const subText = document.getElementById('fireSubText');
+            const timeText = document.getElementById('fireTimeText');
+
+            if (data.fire) {
+                card.classList.add('danger');
+                icon.innerText = '🔥';
+                statusText.innerText = '화재 감지!';
+                subText.innerText = '불꽃이 감지되었습니다. 즉시 확인이 필요합니다.';
+                timeText.innerText = '감지 시각: ' + new Date().toLocaleTimeString('ko-KR');
+            } else {
+                card.classList.remove('danger');
+                icon.innerText = '🟢';
+                statusText.innerText = '정상';
+                subText.innerText = '불꽃이 감지되지 않았습니다.';
+                // 마지막 감지 시각은 그대로 남겨둠
+            }
+        })
+        .catch(error => console.error("불꽃 API 오류:", error));
+}
+fetchFire();
+setInterval(fetchFire, 1000);
+
+let robotOn = false;
+let robotBusy = false;
+
+function renderRobotBtn() {
+    const btn = document.getElementById('robotToggleBtn');
+    if (robotOn) {
+        btn.innerText = '로봇 ON';
+        btn.className = 'robot-toggle on';
+    } else {
+        btn.innerText = '로봇 OFF';
+        btn.className = 'robot-toggle off';
+    }
+}
+
+function toggleRobot() {
+    if (robotBusy) return;
+
+    robotBusy = true;
+
+    const btn = document.getElementById('robotToggleBtn');
+    btn.disabled = true;
+
+    fetch('/api/robot/toggle', {
+        method: 'POST'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Robot toggle request failed');
+        }
+
+        return response.json();
+    })
+    .catch(error => {
+        console.error("로봇 제어 오류:", error);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            robotBusy = false;
+            btn.disabled = false;
+        }, 1000);
+    });
+}
+
+// 로봇 상태값 해석 (값의 의미가 다르면 여기만 수정)
+const ROBOT_STATE_MAP = {
+    0: { text: '정지',   tag: '대기 중',   cls: 'tag-gray'  },
+    1: { text: '주행 중', tag: '정상 주행', cls: 'tag-green' }
+};
+
+function fetchModbus() {
+    fetch('/api/modbus')
+        .then(response => response.json())
+        .then(data => {
+
+            // =====================================
+            // 센서 실시간 데이터
+            // =====================================
+            const sensors = data.sensors || [];
+
+            if (sensors.length >= 4) {
+
+                const temp = sensors[0];
+                const hum  = sensors[1];
+                const co2  = sensors[2];
+                const dust = sensors[3];
+                
+
+                document.getElementById('val-temp').innerText = temp;
+                document.getElementById('val-hum').innerText  = hum;
+                document.getElementById('val-dust').innerText = dust;
+                document.getElementById('val-co2').innerText  = co2;
+
+                updateAirStatus('temp', temp);
+                updateAirStatus('hum', hum);
+                updateAirStatus('dust', dust);
+                updateAirStatus('co2', co2);
+
+
+                // 환경 경고
+                let hasAlert = false;
+                let alertMsg = "";
+
+                if (co2 > 1000) {
+                    hasAlert = true;
+                    alertMsg =
+                        `현재 CO2 농도가 높습니다 (${co2} ppm). 환기가 필요합니다.`;
+                }
+                else if (dust > 80) {
+                    hasAlert = true;
+                    alertMsg =
+                        `현재 미세먼지 농도가 위험 수준입니다 (${dust} µg/m³).`;
+                }
+
+                const alertBanner =
+                    document.getElementById('alertBanner');
+
+                if (hasAlert) {
+                    alertBanner.style.display = 'flex';
+                    document.getElementById('alertText').innerText =
+                        alertMsg;
+                }
+                else {
+                    alertBanner.style.display = 'none';
+                }
+            }
+
+
+            // =====================================
+            // 로봇 상태
+            // =====================================
+            const state = ROBOT_STATE_MAP[data.robot_state] ||
+                {
+                    text: '알 수 없음',
+                    tag: `상태값 ${data.robot_state}`,
+                    cls: 'tag-gray'
+                };
+
+            document.getElementById('robotStateText').innerText =
+                state.text;
+
+            const tag =
+                document.getElementById('robotStateTag');
+
+            tag.innerText = state.tag;
+            tag.className = 'status-tag ' + state.cls;
+
+
+            // 버튼을 실제 로봇 상태와 동기화
+            if (!robotBusy) {
+                robotOn = (data.robot_state === 1);
+                renderRobotBtn();
+            }
+
+
+            // =====================================
+            // 모터별 RPM
+            // =====================================
+            const rpms = data.motor_rpm || [];
+
+            rpms.forEach((v, i) => {
+                const el =
+                    document.getElementById(`rpm-${i}`);
+
+                if (el) {
+                    el.innerText = v;
+                }
+            });
+
+
+            // 평균 RPM
+            const avg = rpms.length
+                ? Math.round(
+                    rpms.reduce((a, b) => a + b, 0)
+                    / rpms.length
+                )
+                : 0;
+
+            document.getElementById('avgRpm').innerText = avg;
+        })
+
+        .catch(error =>
+            console.error("Modbus API 오류:", error)
+        );
+}
+
+
+fetchModbus();
+setInterval(fetchModbus, 500);
+
 </script>
 {% endblock %}

@@ -1,0 +1,17 @@
+# STM32CubeIDE Build Output
+/Debug/
+/Release/
+
+# CubeIDE & Eclipse Settings
+/.settings/
+/.metadata/
+
+# CubeMX Temporary Files
+/MXTmpFiles/
+
+# Build artifacts
+*.bak
+*.log
+*.d
+*.o
+*.su

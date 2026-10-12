@@ -35,62 +35,108 @@
     const rawData = formatToSingleTimeSeries(chartsData);
 
     function createChartConfig(datas) {
-        return {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'CO2 (ppm)',
-                    data: datas,
-                }]
+    return {
+        type: 'line',
+
+        data: {
+            datasets: [{
+                label: 'CO2 (ppm)',
+                data: datas,
+
+                // 선 정리
+                tension: 0.25,
+                borderWidth: 2,
+
+                // 평상시 점 제거
+                pointRadius: 0,
+
+                // 마우스 올렸을 때만 점 표시
+                pointHoverRadius: 5,
+                pointHitRadius: 10
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            interaction: {
+                mode: 'nearest',
+                intersect: false
             },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                title: {
+                    display: true,
+                    text: 'CO2 (ppm)',
+                    align: 'start',
+                    padding: {
+                        bottom: 15
                     },
-                    title: {
-                        display: true,
-                        text: 'CO2 (ppm)',
-                        align: 'start',
-                        padding: {
-                            bottom: 10
-                        },
-                        font: {
-                            weight: 'bold'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: function(context) {
-                                return `${context[0].label}`;
-                            },
-                            label: function(context) {
-                                const raw = context.raw;
-                                return ` [구역 ${raw.point}] CO2: ${raw.y}ppm`;
-                            }
-                        }
+                    font: {
+                        size: 14,
+                        weight: 'bold'
                     }
                 },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            parser: 'HH:mm',
-                            unit: 'hour',
-                            displayFormats: { hour: 'HH:mm' }
+
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
                         },
-                        min: '00:00',
-                        max: '23:59',
+
+                        label: function(context) {
+                            const raw = context.raw;
+
+                            return `CO2: ${raw.y} ppm`;
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    type: 'time',
+
+                    time: {
+                        parser: 'HH:mm',
+                        unit: 'hour',
+                        displayFormats: {
+                            hour: 'HH:mm'
+                        }
                     },
-                    y: {
-                        beginAtZero: false,
-                        min: 0,
-                        max: 2000
+
+                    // 00:00 ~ 23:59 강제 제거
+                    ticks: {
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 8
+                    },
+
+                    grid: {
+                        display: false
+                    }
+                },
+
+                y: {
+                    // 0 ~ 2000 강제 제거
+                    beginAtZero: false,
+
+                    // 데이터 주변에 여백
+                    grace: '10%',
+
+                    ticks: {
+                        maxTicksLimit: 6
                     }
                 }
             }
-        };
-    }
+        }
+    };
+}
 
     const ctx1 = document.getElementById('today');
     const todayChart = new Chart(ctx1, createChartConfig(rawData));
