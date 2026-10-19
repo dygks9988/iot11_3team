@@ -32,7 +32,7 @@
 
 <img width="640" height="512" alt="robot_log" src="https://github.com/user-attachments/assets/a240559f-0fa1-4249-a400-4a629ca4b8c4" />
 
-**Master Raspberry Pi의 시스템 로그이며, Opencv 화재 후보 감지, Master-Slave간 ModbusRTU 패킷을 확인 및 DB 저장 로그를 확인 할 수 있다.**
+**Master Raspberry Pi의 시스템 로그이며, Opencv 화재 후보 감지, Master-Slave간 ModbusRTU 패킷 확인 및 DB 저장 로그를 확인 할 수 있다.**
 
 ### 핵심 기술 적용 경험 및 설계 의도
 
