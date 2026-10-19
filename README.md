@@ -7,8 +7,9 @@
 
 라인 트레이싱 기반 이동형 로봇이 지정 경로를 자율 주행하며 환경 데이터를 수집하고, STM32와 Raspberry Pi 간 Modbus RTU 통신을 통해 센서 데이터, 모터 RPM, 로봇 동작 상태를 수집·모니터링하는 시스템이다.
 
-수집된 데이터는 웹 대시보드에서 확인할 수 있으며 DB에 저장한다,화재 감지용 카메라 영상을 실시간 스트리밍한다. 영상 기반 화재 후보 감지와 CO₂ 센서 데이터를 함께 활용하여 화재 상황을 판단하고, 화재가 감지되면 로봇을 자동 정지시킨 뒤 웹을 통해 상태를 확인할 수 있도록 구성하였다.
+수집된 데이터는 웹 대시보드에서 확인할 수 있으며 DB에 저장한다.화재 감지용 카메라 영상을 웹에 실시간 스트리밍한다. 영상 기반 화재 후보 감지와 CO₂ 센서 데이터를 함께 활용하여 화재 상황을 판단하고, 화재가 감지되면 로봇을 자동 정지시킨 뒤 웹을 통해 상태를 확인할 수 있도록 구성하였다.
 
+**Raspberry Pi Master와 두 STM32 Slave로 역할을 분리하고, RS-485 기반 Modbus RTU 멀티드롭 통신을 통해 환경 데이터 수집·로봇 제어·웹 모니터링 기능을 통합하였습니다.**
 
 ## 대시보드
 
@@ -24,7 +25,7 @@
 <img width="700" height="500" alt="fire_detection_demo" src="https://github.com/user-attachments/assets/f5438dc1-c458-45c3-84f5-9f8a0cb37e8d" />
 <img width="452" height="70" alt="image" src="https://github.com/user-attachments/assets/f4ebe7a3-12a1-418c-99ff-e7c676213868" />
 
-※ 화재 오탐지를 줄이기 위해 영상 기반 화재 후보 검출 결과와 CO₂ 센서 데이터를 함께 판단합니다.
+※ 화재 오탐지를 줄이기 위해 영상 기반 화재 후보 검출 결과와 CO₂ 센서 데이터를 함께 판단한다.
 
 ## 시스템 로그
 
@@ -32,21 +33,48 @@
 <img width="640" height="512" alt="robot_log" src="https://github.com/user-attachments/assets/a240559f-0fa1-4249-a400-4a629ca4b8c4" />
 
 
-## 시스템 구상도
+### 핵심 기술 적용 경험 및 설계 의도
 
-Master Rasp
+| 적용 장치 | 핵심 기술 | 설계 목적 및 적용 이유 |
+|---|---|---|
+| **Raspberry Pi Master / STM32 Slave** | RS-485 + Modbus RTU | 복수의 STM32 슬레이브를 한 RS-485 버스에 연결하는 멀티드롭 구조를 위해 채택. 주소·기능 코드·레지스터 기반 프로토콜로 확장성 확보. Modbus Poll로 레지스터 읽기 응답 검증 |
+| **Master Raspberry Pi** | OpenCV + CO₂ 센서 데이터 | 영상 기반 화재 후보 검출 결과와 Environment STM32에서 수집한 CO₂ 센서 데이터를 함께 판단하여 오탐지를 줄이기 위해 적용 |
+| **Actuator STM32** | Timer Trigger + ADC DMA | 타이머로 센서 수집 주기를 일정하게 유지하고, DMA를 활용하여 CPU의 데이터 수집 부담을 줄이기 위해 적용 |
+| **Actuator STM32** | FreeRTOS Semaphore / Queue | Semaphore로 ISR과 센서 처리 태스크를 동기화하고, Queue를 통해 모터 제어 명령 전달 및 UART 수신 데이터를 파서 태스크로 전달하기 위해 적용 |
+| **Actuator STM32** | IR 센서 + PD 제어 | 라인 위치 오차와 오차 변화량을 반영하여 좌우 모터 출력을 조정하기 위해 적용 |
+| **Actuator STM32** | Timer Encoder + PWM | 엔코더로 모터별 실제 RPM을 측정하고, 구동 특성 차이를 고려한 PWM 출력 보정값을 적용하기 위해 활용 |
+| **Actuator STM32** | UART DMA Circular + IDLE | CPU의 바이트 단위 수신 처리 부담을 줄이고, IDLE 이벤트를 기준으로 Modbus RTU 요청 데이터를 처리하기 위해 적용 |
+
+
+## 시스템 아키텍처
+
+  ### Integrated System
+<img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/f4def5d1-ea76-4a96-b0f6-3b00172e4ec3" />
 
 
 
-Protocol UART
+
+### Actuator
+
+<img width="1000" height="700" alt="image" src="https://github.com/user-attachments/assets/407d7064-0888-4759-b391-8e102d21b40d" />
+
+| 측정 항목 | 측정 결과 | 의미 |
+|---|---:|---|
+| ADC DMA Complete ISR | 4.128 µs | ADC DMA 완료 인터럽트 처리 시간 |
+| Motor Instruction Task | 2.76 µs | 센서값 판단 및 모터 명령 생성 시간 |
+| Actuator Task | 3.00 µs | 명령 수신 후 모터 출력 반영 시간 |
+| End-to-End Latency | 32.625 µs | ADC DMA 완료부터 Actuator 출력 반영까지의 전체 지연시간 |
+| Control Period | 10.000637 ms | 제어 루프 실행 주기 |
+
+ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-to-End latency를 GPIO 토글과 Logic Analyzer로 측정한 결과
+
+약 32.625 µs였으며, 10 ms 제어 주기 대비 충분한 실행 여유를 확인하였다.
 
 
 
-Slave Actuator STM32
 
 
 
-Slave Environment STM32
 
 ## 역할 분담
 ### 이요한
@@ -59,34 +87,9 @@ Slave Environment STM32
 ### 박지우
 
 
-## 시스템 아키텍처
-
-  ### Integrated System
-<img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/f4def5d1-ea76-4a96-b0f6-3b00172e4ec3" />
 
 
 
-
-
-
-### Actuator
-
-<img width="1000" height="700" alt="image" src="https://github.com/user-attachments/assets/407d7064-0888-4759-b391-8e102d21b40d" />
-
-
-
-| 측정 항목 | 측정 결과 | 의미 |
-|---|---:|---|
-| ADC DMA Complete ISR | 4.128 µs | ADC DMA 완료 인터럽트 처리 시간 |
-| Motor Instruction Task | 2.76 µs | 센서값 판단 및 모터 명령 생성 시간 |
-| Actuator Task | 3.00 µs | 명령 수신 후 모터 출력 반영 시간 |
-| End-to-End Latency | 32.625 µs | ADC DMA 완료부터 Actuator 출력 반영까지의 전체 지연시간 |
-| Control Period | 10.000637 ms | 제어 루프 실행 주기 |
-| Control Frequency | 99.99 Hz | 제어 루프 동작 주파수 |
-
-ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-to-End latency를 GPIO 토글과 Logic Analyzer로 측정한 결과
-
-약 32.625 µs였으며, 10 ms 제어 주기 대비 충분한 실행 여유를 확인하였다.
 
 ## 현재 구현 상태
 
