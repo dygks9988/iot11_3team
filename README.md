@@ -37,7 +37,7 @@
 
 | 적용 장치 | 핵심 기술 | 설계 목적 및 적용 이유 |
 |---|---|---|
-| **Raspberry Pi Master / STM32 Slave** | RS-485 + Modbus RTU | 복수의 STM32 슬레이브를 한 RS-485 버스에 연결하는 멀티드롭 구조를 위해 채택. 주소·기능 코드·레지스터 기반 프로토콜로 확장성 확보. Modbus Poll로 레지스터 읽기 응답 검증 |
+| **Raspberry Pi Master / STM32 Slave** | RS-485 + Modbus RTU | 복수의 STM32 슬레이브를 한 RS-485 버스에 연결하는 멀티드롭 구조를 위해 채택. 주소,기능 코드,레지스터 기반 프로토콜로 확장성 확보. Modbus Poll로 레지스터 읽기 응답 검증 |
 | **Master Raspberry Pi** | OpenCV + CO₂ 센서 데이터 | 영상 기반 화재 후보 검출 결과와 Environment STM32에서 수집한 CO₂ 센서 데이터를 함께 판단하여 오탐지를 줄이기 위해 적용 |
 | **Actuator STM32** | Timer Trigger + ADC DMA | 타이머로 센서 수집 주기를 일정하게 유지하고, DMA를 활용하여 CPU의 데이터 수집 부담을 줄이기 위해 적용 |
 | **Actuator STM32** | FreeRTOS Semaphore / Queue | Semaphore로 ISR과 센서 처리 태스크를 동기화하고, Queue를 통해 모터 제어 명령 전달 및 UART 수신 데이터를 파서 태스크로 전달하기 위해 적용 |
