@@ -19,6 +19,12 @@
 
 <img width="700" height="500" alt="line_tracking_demo_readme_" src="https://github.com/user-attachments/assets/ca46c798-3617-42ce-9b3b-e2e6d72c6281" />
 
+## 영상 기반 화재 감지 및 웹 모니터링
+
+<img width="700" height="500" alt="fire_detection_demo" src="https://github.com/user-attachments/assets/f5438dc1-c458-45c3-84f5-9f8a0cb37e8d" />
+<img width="452" height="70" alt="image" src="https://github.com/user-attachments/assets/f4ebe7a3-12a1-418c-99ff-e7c676213868" />
+
+※ 화재 오탐지를 줄이기 위해 영상 기반 화재 후보 검출 결과와 CO₂ 센서 데이터를 함께 판단합니다.
 
 ## 시스템 로그
 
