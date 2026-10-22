@@ -63,6 +63,11 @@
 
 <img width="1000" height="700" alt="image" src="https://github.com/user-attachments/assets/407d7064-0888-4759-b391-8e102d21b40d" />
 
+
+### Sensor
+<img width="1000" height="700" alt="freertos_architecture_v3" src="https://github.com/user-attachments/assets/14978be2-69f9-4045-9b45-92e1c69ac98f" />
+
+
 | 측정 항목 | 측정 결과 | 의미 |
 |---|---:|---|
 | ADC DMA Complete ISR | 4.128 µs | ADC DMA 완료 인터럽트 처리 시간 |
