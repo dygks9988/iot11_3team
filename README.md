@@ -46,7 +46,7 @@
 | **Actuator STM32** | Timer Encoder + PWM | 엔코더로 모터별 실제 RPM을 측정하고, 구동 특성 차이를 고려한 PWM 출력 보정값을 적용하기 위해 활용 |
 | **Actuator STM32** | UART DMA Circular + IDLE | CPU의 바이트 단위 수신 처리 부담을 줄이고, IDLE 이벤트를 기준으로 Modbus RTU 요청 데이터를 처리하기 위해 적용 |
 | **Sensor STM32** | FreeRTOS Mutex / Queue | Mutex로 공유 센서 데이터(구조체)를 보호하고, Queue를 통해 Modbus 요청 메시지를 전달하기 위해 적용 |
-| **Sensor STM32** | GPIO 타이밍 제어 + 임계구 | 온습도 센서(DHT11)의 디지털 신호 읽기 시 taskENTER_CRITICAL()과 타이머를 활용해 펄스 폭을 정밀 측정하기 위해 적용 |
+| **Sensor STM32** | GPIO 타이밍 제어 + 임계구역 | 온습도 센서(DHT11)의 디지털 신호 읽기 시 taskENTER_CRITICAL()과 타이머를 활용해 펄스 폭을 정밀 측정하기 위해 적용 |
 | **Sensor STM32** | UART 통신 + Thread Flag | CO2 센서(CM1106)와 UART 통신을 수행하고, 수신 완료 이벤트를 osThreadFlagsWait()로 효율적으로 처리하기 위해 적용 |
 | **Sensor STM32** | ADC 샘플링 + 타이머 제어 | 미세먼지 센서 구동 시 타이머로 LED 제어 타이밍을 맞추고, ADC Injected 모드로 아날로그 값을 정밀 측정하기 위해 적용 |
 
