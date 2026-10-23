@@ -93,7 +93,12 @@ ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-
 - Modbus RTU 기반 Master–Slave 통신 구조 설계 및 구동부 프로토콜 처리 로직 구현
 - 라인트레이싱 및 모터 제어 로직 구현
 - Raspberry Pi Flask 프로그램 작성
+  
 ### 홍원표
+- STM32 센서부 펌웨어 및 FreeRTOS 기반 온/습도, CO2, 미세먼지 데이터 수집 로직 구현
+- 센서부(Slave 1) 및 Raspberry pi(Master) Modbus RTU 프로토콜 처리 로직 구현
+- Raspberry Pi MySQL 기반 DB 생성 및 수집된 센서 데이터 통합 관리 환경 구축
+  
 ### 박지우
 
 
@@ -134,6 +139,17 @@ ADC DMA Complete ISR → Motor Instruction Task → Actuator Task 경로의 End-
 - Modbus protocol (Read coil,reg) (Write coil)등 제한된 기능 구현
 
 - RS485 마스터, 슬레이브간 테스트 완료.
+
+
+**센서부**
+
+- 온습도 센서(DHT11) : GPIO 비트뱅 + 타이머 기반 마이크로초 단위 신호 측정으로 온습도 값 수집
+
+- CO2 센서(CM1106) : UART DMA 기반 요청/응답 방식으로 CO2 농도(ppm) 측정
+
+- 미세먼지 센서(GP2Y1010AU0F) : LED 펄스 타이밍에 맞춘 ADC 샘플링으로 미세먼지 농도 산출
+
+- Modbus protocol (Read Holding Registers) 제한된 기능 구현
 
 **개선 사항**
 - 직접 조종 모드(웹에서 자율주행과 직접조종을 토글)
