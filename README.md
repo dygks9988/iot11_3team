@@ -241,6 +241,8 @@ Serial : UART,RS-485
 
 - ROBOT_STATE = 0x00
 
+**프로젝트 일정상 Write Single coil의 응답을 후순위로 미루었다**
+
 
 ### Sensor Slave
 **SensorRegisterMap**
@@ -248,20 +250,3 @@ Serial : UART,RS-485
 - REG_Humid_Addr = 0x01
 - REG_Co2_Addr = 0x02
 - REG_Dust_Addr = 0x03
-
-**프로젝트 일정상 Write Single coil의 응답을 후순위로 미루었다**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
